@@ -12,7 +12,7 @@
       color: #cdd6f4;
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      min-height: 100vh;
     }
     header {
       background-color: #11111b;
@@ -28,7 +28,7 @@
     .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     
     select, button {
-      padding: 7px 12px;
+      padding: 8px 14px;
       border: none;
       border-radius: 6px;
       font-weight: bold;
@@ -37,7 +37,7 @@
     }
     select { background-color: #313244; color: #cdd6f4; outline: none; }
     #runBtn { background-color: #a6e3a1; color: #11111b; }
-    #runBtn:hover { background-color: #94e2d5; }
+    #runBtn:active { transform: scale(0.97); }
     #runBtn:disabled { background-color: #585b70; cursor: not-allowed; }
     #clearBtn { background-color: #45475a; color: #cdd6f4; }
     #copyBtn { background-color: #89b4fa; color: #11111b; }
@@ -45,7 +45,6 @@
     .main-container {
       display: flex;
       flex: 1;
-      overflow: hidden;
     }
     .editor-pane, .io-pane {
       flex: 1;
@@ -56,17 +55,17 @@
     .editor-pane { border-right: 1px solid #313244; }
     label { font-size: 12px; color: #a6adc8; margin-bottom: 6px; font-weight: bold; }
 
-    /* लाइन नंबर और एडिटर बॉक्स */
     .editor-wrapper {
       display: flex;
       flex: 1;
+      min-height: 260px;
       background-color: #181825;
       border: 1px solid #313244;
       border-radius: 8px;
       overflow: hidden;
     }
     #lineNumbers {
-      width: 40px;
+      width: 38px;
       background-color: #11111b;
       color: #6c7086;
       padding: 12px 5px;
@@ -91,13 +90,14 @@
     }
     #codeEditor { flex: 1; white-space: pre; overflow-x: auto; }
     #stdinInput {
-      height: 85px;
+      height: 80px;
       margin-bottom: 12px;
       border: 1px solid #313244;
       border-radius: 8px;
     }
     #outputBox {
       flex: 1;
+      min-height: 140px;
       background-color: #11111b;
       border: 1px solid #313244;
       border-radius: 8px;
@@ -111,9 +111,8 @@
     .success-text { color: #a6e3a1; }
 
     @media (max-width: 768px) {
-      .main-container { flex-direction: column; overflow-y: auto; }
-      .editor-pane { border-right: none; border-bottom: 1px solid #313244; min-height: 320px; }
-      .io-pane { min-height: 280px; }
+      .main-container { flex-direction: column; }
+      .editor-pane { border-right: none; border-bottom: 1px solid #313244; }
     }
   </style>
 </head>
@@ -155,12 +154,3 @@
   <script>
     const templates = {
       sum: {
-        code: `#include <stdio.h>\n\nint main() {\n    int a, b;\n    printf("Enter two numbers:\\n");\n    scanf("%d %d", &a, &b);\n    printf("Sum = %d\\n", a + b);\n    return 0;\n}`,
-        input: "15 25"
-      },
-      factorial: {
-        code: `#include <stdio.h>\n\nint main() {\n    int n, i;\n    unsigned long long fact = 1;\n    scanf("%d", &n);\n    for (i = 1; i <= n; ++i) {\n        fact *= i;\n    }\n    printf("Factorial of %d = %llu\\n", n, fact);\n    return 0;\n}`,
-        input: "5"
-      },
-      prime: {
-        code: `#include <stdio.h>\n\nint main() {\n    int n, i, flag = 0;\n    scanf("%d", &n);\n    if (n <= 1) flag = 1;\n    for (i = 2; i <= n / 2; ++i) {\n        if (n % i == 0) {\n            flag = 1;\n            break;\n        }\n    }\n    if (flag == 0)\n        printf("%d is a Prime number.\\n", n);\n    else\n        printf("%d is NOT a Prime number.\\n", n);\n    return 0;\n}`,
