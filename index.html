@@ -3,154 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Campus C Compiler - Live Lab</title>
+  <title>Campus C Lab - Live Compiler</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body {
-      margin: 0;
-      background-color: #1e1e2e;
+      background-color: #11111b;
       color: #cdd6f4;
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
     }
     header {
-      background-color: #11111b;
-      padding: 10px 18px;
+      background-color: #181825;
+      padding: 12px 20px;
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid #313244;
+      border-bottom: 2px solid #313244;
     }
-    header h2 { margin: 0; font-size: 18px; color: #89b4fa; }
-    .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    
-    select, button {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 6px;
+    header h2 {
+      font-size: 18px;
+      color: #89b4fa;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge {
+      background-color: #a6e3a1;
+      color: #11111b;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
       font-weight: bold;
-      cursor: pointer;
-      font-size: 13px;
     }
-    select { background-color: #313244; color: #cdd6f4; outline: none; }
-    #runBtn { background-color: #a6e3a1; color: #11111b; }
-    #runBtn:active { transform: scale(0.97); }
-    #runBtn:disabled { background-color: #585b70; cursor: not-allowed; }
-    #clearBtn { background-color: #45475a; color: #cdd6f4; }
-    #copyBtn { background-color: #89b4fa; color: #11111b; }
-
-    .main-container {
-      display: flex;
+    .compiler-frame {
       flex: 1;
-    }
-    .editor-pane, .io-pane {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 12px;
-    }
-    .editor-pane { border-right: 1px solid #313244; }
-    label { font-size: 12px; color: #a6adc8; margin-bottom: 6px; font-weight: bold; }
-
-    .editor-wrapper {
-      display: flex;
-      flex: 1;
-      min-height: 260px;
-      background-color: #181825;
-      border: 1px solid #313244;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    #lineNumbers {
-      width: 38px;
-      background-color: #11111b;
-      color: #6c7086;
-      padding: 12px 5px;
-      text-align: right;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 15px;
-      line-height: 1.5;
-      user-select: none;
-      overflow: hidden;
-    }
-    textarea {
       width: 100%;
-      background-color: #181825;
-      color: #f8f8f2;
       border: none;
-      padding: 12px;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 15px;
-      line-height: 1.5;
-      resize: none;
-      outline: none;
-    }
-    #codeEditor { flex: 1; white-space: pre; overflow-x: auto; }
-    #stdinInput {
-      height: 80px;
-      margin-bottom: 12px;
-      border: 1px solid #313244;
-      border-radius: 8px;
-    }
-    #outputBox {
-      flex: 1;
-      min-height: 140px;
-      background-color: #11111b;
-      border: 1px solid #313244;
-      border-radius: 8px;
-      padding: 12px;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 14px;
-      white-space: pre-wrap;
-      overflow-y: auto;
-    }
-    .error-text { color: #f38ba8; }
-    .success-text { color: #a6e3a1; }
-
-    @media (max-width: 768px) {
-      .main-container { flex-direction: column; }
-      .editor-pane { border-right: none; border-bottom: 1px solid #313244; }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h2>⚡ Campus C Lab</h2>
-    <div class="controls">
-      <select id="templateSelect" onchange="loadTemplate()">
-        <option value="sum">1. Sum of Two Numbers</option>
-        <option value="factorial">2. Factorial Program</option>
-        <option value="prime">3. Check Prime Number</option>
-        <option value="pattern">4. Star Pyramid Pattern</option>
-      </select>
-      <button id="copyBtn" onclick="copyCode()">Copy</button>
-      <button id="clearBtn" onclick="clearCode()">Clear</button>
-      <button id="runBtn" onclick="runCode()">▶ Run Code</button>
-    </div>
+    <h2>⚡ Campus C Lab <span class="badge">LIVE GCC</span></h2>
+    <span style="font-size: 12px; color: #a6adc8;">By SP</span>
   </header>
 
-  <div class="main-container">
-    <div class="editor-pane">
-      <label for="codeEditor">main.c (यहाँ अपना C कोड लिखें):</label>
-      <div class="editor-wrapper">
-        <div id="lineNumbers">1</div>
-        <textarea id="codeEditor" spellcheck="false" oninput="updateLineNumbers()" onscroll="syncScroll()"></textarea>
-      </div>
-    </div>
+  <iframe 
+    class="compiler-frame" 
+    src="https://onecompiler.com/embed/c?theme=dark&hideNew=true&hideNewFileOption=true&hideTitle=true" 
+    allow="clipboard-write"
+    title="Campus C Compiler">
+  </iframe>
 
-    <div class="io-pane">
-      <label for="stdinInput">Standard Input (scanf के लिए इनपुट यहाँ लिखें):</label>
-      <textarea id="stdinInput" placeholder="उदाहरण: 10 20"></textarea>
-
-      <label>Output / Compiler Errors:</label>
-      <div id="outputBox">ऊपर दिए गए '▶ Run Code' बटन को दबाएं...</div>
-    </div>
-  </div>
-
-  <script>
-    const templates = {
-      sum: {
+</body>
+</html>
