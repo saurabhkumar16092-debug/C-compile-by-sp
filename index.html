@@ -4,13 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- स्टेप 1 में Google से कॉपी किया गया वेरिफिकेशन टैग नीचे वाली लाइन की जगह पेस्ट करें -->
   <meta name="google-site-verification" content="PnEzym5TDHD1qt3sfGdv5199iC9TrZ78o5uynPiIC-k" />
 
-  <!-- Google Search में ऊपर लाने के लिए SEO जानकारी -->
-  <title>Campus C Lab by SP - Free Online C Compiler</title>
-  <meta name="description" content="Campus C Lab by SP is a fast, free online C compiler and live coding lab for B.Tech students to write, compile, and run C programs easily on mobile and laptop." />
-  <meta name="keywords" content="Campus C Lab, Campus C Lab by SP, C compile by sp, online C compiler, free C lab, saurabhkumar16092-debug" />
+  <title>Campus C Lab by SP - Free Online Interactive C Compiler</title>
+  <meta name="description" content="Campus C Lab by SP is a fast, free interactive online C compiler for B.Tech students to write, compile, and run C programs with live terminal input on mobile and desktop." />
+  <meta name="keywords" content="Campus C Lab, Campus C Lab by SP, C compile by sp, interactive C compiler, online C terminal, saurabhkumar16092-debug" />
   <meta name="author" content="SP (Saurabh Kumar)" />
 
   <style>
@@ -25,14 +23,14 @@
     }
     header {
       background-color: #181825;
-      padding: 12px 20px;
+      padding: 10px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid #313244;
     }
     header h1 {
-      font-size: 18px;
+      font-size: 17px;
       color: #89b4fa;
       display: flex;
       align-items: center;
@@ -41,10 +39,18 @@
     .badge {
       background-color: #a6e3a1;
       color: #11111b;
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 12px;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
       font-weight: bold;
+    }
+    .tip-bar {
+      background-color: #1e1e2e;
+      color: #f9e2af;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-bottom: 1px solid #313244;
+      text-align: center;
     }
     .compiler-frame {
       flex: 1;
@@ -56,16 +62,21 @@
 <body>
 
   <header>
-    <h1>⚡ Campus C Lab <span class="badge">LIVE GCC</span></h1>
+    <h1>⚡ Campus C Lab <span class="badge">LIVE TERMINAL</span></h1>
     <span style="font-size: 12px; color: #a6adc8;">By SP</span>
   </header>
 
+  <div class="tip-bar">
+    💡 Tip: <b>Run</b> दबाने के बाद नीचे काले Terminal बॉक्स में टच करके सीधे कीबोर्ड से इनपुट लिखें।
+  </div>
+
   <iframe 
     class="compiler-frame" 
-    src="https://onecompiler.com/embed/c?theme=dark&hideNew=true&hideNewFileOption=true&hideTitle=true" 
+    src="https://www.programiz.com/c-programming/online-compiler/" 
     allow="clipboard-write"
-    title="Campus C Compiler">
+    title="Campus C Interactive Terminal">
   </iframe>
 
 </body>
 </html>
+
