@@ -27,14 +27,29 @@ select{background:#313244;color:#cdd6f4;max-width:95px}
 textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 10px;font-family:monospace;font-size:16px;line-height:1.5;resize:none;outline:none;white-space:pre;overflow:auto}
 .CodeMirror{flex:1;height:100%!important;font-family:monospace;font-size:16px;line-height:1.5}
 .term-box{flex:0.9;display:flex;flex-direction:column;background:#0b0b12;min-height:0}
-#out{flex:1;padding:12px;font-family:monospace;font-size:15px;line-height:1.5;color:#a6e3a1;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+#out{flex:1;padding:12px;font-family:monospace;font-size:16px;line-height:1.5;color:#a6e3a1;overflow-y:auto;white-space:pre-wrap;word-break:break-word;cursor:text}
 .u-in{color:#89dceb;font-weight:bold}
 .err{color:#f38ba8}
 .sys{color:#f9e2af;font-style:italic}
-.hint{color:#94e2d5;font-size:13px}
-.in-bar{display:flex;background:#181825;border-top:1px solid #313244;padding:8px;gap:6px;align-items:center}
-#inp{flex:1;background:#11111b;color:#fff;border:1px solid #45475a;border-radius:6px;padding:9px;font-family:monospace;font-size:16px;outline:none}
-#sendBtn{background:#89b4fa;color:#11111b;padding:9px 14px}
+.hint{color:#94e2d5;font-size:14px}
+
+/* Inline Terminal Input right next to prompt text */
+.inline-inp{
+  background:transparent;
+  border:none;
+  border-bottom:1px dashed #89b4fa;
+  color:#89dceb;
+  font-family:monospace;
+  font-size:16px;
+  font-weight:bold;
+  outline:none;
+  width:140px;
+  min-width:60px;
+  caret-color:#a6e3a1;
+  padding:0 2px;
+  vertical-align:baseline;
+}
+
 #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99;justify-content:center;align-items:center;padding:15px}
 .m-box{background:#1e1e2e;border:1px solid #45475a;border-radius:10px;width:100%;max-width:440px;max-height:75vh;display:flex;flex-direction:column;overflow:hidden}
 .m-head{background:#181825;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
@@ -76,14 +91,9 @@ int main() {
   </div>
 </div>
 
-<div class="term-box" onclick="if(!inp.disabled)inp.focus()">
+<div class="term-box" onclick="focusInline()">
   <div class="lbl"><span>Terminal Output</span><span id="stTxt" style="color:#89b4fa">Ready</span></div>
-  <div id="out">▶ 'Run' dabane ke baad yahan output aayega...</div>
-  <div class="in-bar">
-    <span style="color:#a6e3a1;font-weight:bold">&gt;</span>
-    <input type="text" id="inp" placeholder="Input likhein aur Enter dabaein..." disabled>
-    <button id="sendBtn" type="button" onclick="sendIn()" disabled>Enter ↵</button>
-  </div>
+  <div id="out">▶ 'Run' dabane ke baad yahan output aayega aur wahin samne cursor par aap value likh sakte hain...</div>
 </div>
 
 <div id="modal" onclick="if(event.target===this)this.style.display='none'">
@@ -162,11 +172,18 @@ function loadEx(){
   s.value='';
 }
 
-const out=document.getElementById('out'),inp=document.getElementById('inp'),sBtn=document.getElementById('sendBtn'),rBtn=document.getElementById('runBtn'),st=document.getElementById('stTxt');
-let grps=[],toks=[],gIdx=0,tInG=0,running=false,vars={};
+const out=document.getElementById('out'),rBtn=document.getElementById('runBtn'),st=document.getElementById('stTxt');
+let grps=[],toks=[],gIdx=0,tInG=0,running=false,vars={},activeInp=null;
 
-function clrTerm(){out.innerHTML='';st.textContent='Ready';}
-inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendIn();}});
+function focusInline(){
+  if(activeInp) activeInp.focus();
+}
+
+function clrTerm(){
+  activeInp=null;
+  out.innerHTML='';
+  st.textContent='Ready';
+}
 
 function parseCode(code){
   const cl=code.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/.*$/gm,''),lines=cl.split('\n'),res=[];
@@ -194,34 +211,93 @@ function expCnt(g){
 }
 
 async function runCode(){
-  const c=getC();saveHist(c);toks=[];gIdx=0;tInG=0;vars={};running=true;out.innerHTML='';rBtn.disabled=true;
+  const c=getC();saveHist(c);toks=[];gIdx=0;tInG=0;vars={};running=true;activeInp=null;out.innerHTML='';rBtn.disabled=true;
   grps=parseCode(c);
   if(grps.length)showP(true);else await execAPI();
 }
 
 function showP(first){
   const g=grps[gIdx],tot=expCnt(g),rem=tot-tInG;
-  out.innerHTML+=first?esc(g.p):`<span class="hint">↳ ${rem} value(s) aur enter karein: </span>`;
+  const promptSpan=document.createElement('span');
+  if(first){
+    promptSpan.textContent=g.p;
+  }else{
+    promptSpan.className='hint';
+    promptSpan.textContent=`↳ (${rem} aur): `;
+  }
+  out.appendChild(promptSpan);
+
+  // Create inline input right next to the prompt text
+  const inp=document.createElement('input');
+  inp.type='text';
+  inp.className='inline-inp';
+  inp.autocomplete='off';
+  inp.autocorrect='off';
+  inp.spellcheck=false;
+  inp.addEventListener('input',()=>{
+    inp.style.width=Math.max(80,(inp.value.length+2)*10)+'px';
+  });
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      e.preventDefault();
+      sendIn(inp);
+    }
+  });
+
+  out.appendChild(inp);
+  activeInp=inp;
   out.scrollTop=out.scrollHeight;
-  st.textContent=`Input (${tInG}/${tot})`;inp.disabled=false;sBtn.disabled=false;inp.value='';inp.focus();
+  st.textContent=`Input (${tInG}/${tot})`;
+  setTimeout(()=>inp.focus(),10);
 }
 
-async function sendIn(){
-  if(!running||inp.disabled)return;
+async function sendIn(inp){
+  if(!running||!inp)return;
   const raw=inp.value.trim();
-  if(!raw){out.innerHTML+=`\n<span class="err">⚠ Khali input nahi chalega: </span>`;return;}
+  if(!raw){
+    inp.placeholder='value likhein...';
+    inp.focus();
+    return;
+  }
   const g=grps[gIdx],tot=expCnt(g),nt=raw.split(/\s+/);
   for(let i=0;i<nt.length;i++){
     const sp=g.sp[(tInG+i)%g.sp.length];
     if(/%[diu]/i.test(sp)&&!/^-?\d+$/.test(nt[i])){
-      out.innerHTML+=`<span class="u-in">${esc(raw)}</span>\n<span class="err">⚠ Error: '${esc(nt[i])}' integer (%d) nahi hai! Dobara likhein: </span>`;
-      inp.value='';inp.focus();return;
+      const errSpan=document.createElement('span');
+      errSpan.className='err';
+      errSpan.textContent=`\n⚠ '${nt[i]}' number nahi hai! Dobara likhein: `;
+      inp.replaceWith(document.createTextNode(raw));
+      out.appendChild(errSpan);
+      // Re-create clean inline input
+      const retryInp=document.createElement('input');
+      retryInp.type='text';
+      retryInp.className='inline-inp';
+      retryInp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendIn(retryInp);}});
+      out.appendChild(retryInp);
+      activeInp=retryInp;
+      out.scrollTop=out.scrollHeight;
+      retryInp.focus();
+      return;
     }
   }
-  out.innerHTML+=`<span class="u-in">${esc(raw)}</span>\n`;
+
+  // Replace live input box with static cyan text + newline
+  const valSpan=document.createElement('span');
+  valSpan.className='u-in';
+  valSpan.textContent=raw+'\n';
+  inp.replaceWith(valSpan);
+  activeInp=null;
+
   if(g.lp.length===0)nt.forEach((t,i)=>{const v=g.vn[tInG+i];if(v&&!isNaN(parseInt(t,10)))vars[v]=parseInt(t,10);});
-  toks.push(...nt);tInG+=nt.length;inp.value='';inp.disabled=true;sBtn.disabled=true;
-  if(tInG<tot)showP(false);else{gIdx++;tInG=0;if(gIdx<grps.length)showP(true);else await execAPI();}
+  toks.push(...nt);
+  tInG+=nt.length;
+
+  if(tInG<tot)showP(false);
+  else{
+    gIdx++;tInG=0;
+    if(gIdx<grps.length)showP(true);
+    else await execAPI();
+  }
 }
 
 async function execAPI(retry=0){
@@ -248,7 +324,7 @@ async function execAPI(retry=0){
   }
 }
 
-function done(s){running=false;rBtn.disabled=false;inp.disabled=true;sBtn.disabled=true;st.textContent=s;}
+function done(s){running=false;rBtn.disabled=false;activeInp=null;st.textContent=s;}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 </body>
