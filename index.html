@@ -2,14 +2,20 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
   <meta name="google-site-verification" content="PnEzym5TDHD1qt3sfGdv5199iC9TrZ78o5uynPiIC-k" />
 
   <title>Campus C Lab by SP - Interactive Online C Compiler</title>
-  <meta name="description" content="Campus C Lab by SP is a free interactive online C compiler for B.Tech students with step-by-step live terminal input on mobile and desktop." />
+  <meta name="description" content="Campus C Lab by SP is a free interactive online C compiler for B.Tech students with syntax highlighting and step-by-step live terminal input." />
   <meta name="keywords" content="Campus C Lab, Campus C Lab by SP, C compile by sp, interactive C compiler, online C terminal, saurabhkumar16092-debug" />
   <meta name="author" content="SP (Saurabh Kumar)" />
+
+  <!-- VS Code Style Colorful Syntax Highlighting (CodeMirror) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -42,7 +48,7 @@
       background-color: #a6e3a1;
       color: #11111b;
       font-size: 10px;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 8px;
       font-weight: bold;
     }
@@ -52,7 +58,7 @@
     }
     button {
       border: none;
-      padding: 7px 14px;
+      padding: 8px 14px;
       border-radius: 6px;
       font-weight: bold;
       font-size: 13px;
@@ -71,9 +77,9 @@
       color: #cdd6f4;
     }
 
-    /* Top Editor Section */
+    /* Top Colorful Editor Section */
     .editor-container {
-      flex: 1.1;
+      flex: 1.15;
       display: flex;
       flex-direction: column;
       border-bottom: 2px solid #45475a;
@@ -83,30 +89,24 @@
       background-color: #1e1e2e;
       color: #a6adc8;
       font-size: 11px;
-      padding: 4px 12px;
+      padding: 5px 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       display: flex;
       justify-content: space-between;
+      border-bottom: 1px solid #282a36;
     }
-    textarea#codeEditor {
+    .CodeMirror {
       flex: 1;
-      width: 100%;
-      background-color: #1e1e2e;
-      color: #f8f8f2;
-      border: none;
-      padding: 12px;
+      height: 100% !important;
       font-family: 'Courier New', Courier, monospace;
       font-size: 14px;
       line-height: 1.5;
-      resize: none;
-      outline: none;
-      tab-size: 4;
     }
 
     /* Bottom Interactive Terminal Section */
     .terminal-container {
-      flex: 0.9;
+      flex: 0.85;
       display: flex;
       flex-direction: column;
       background-color: #0b0b12;
@@ -117,7 +117,7 @@
       padding: 10px 12px;
       font-family: 'Courier New', Courier, monospace;
       font-size: 14px;
-      line-height: 1.45;
+      line-height: 1.5;
       color: #a6e3a1;
       overflow-y: auto;
       white-space: pre-wrap;
@@ -135,12 +135,12 @@
       font-style: italic;
     }
 
-    /* Live Input Bar inside Terminal */
+    /* Live Input Bar */
     .input-bar {
       display: flex;
       background-color: #181825;
       border-top: 1px solid #313244;
-      padding: 6px 8px;
+      padding: 8px;
       gap: 6px;
       align-items: center;
     }
@@ -148,15 +148,15 @@
       color: #a6e3a1;
       font-family: monospace;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 16px;
     }
     #termInput {
       flex: 1;
       background-color: #11111b;
       color: #ffffff;
       border: 1px solid #45475a;
-      border-radius: 5px;
-      padding: 8px 10px;
+      border-radius: 6px;
+      padding: 9px 10px;
       font-family: 'Courier New', Courier, monospace;
       font-size: 14px;
       outline: none;
@@ -167,27 +167,27 @@
     #sendInputBtn {
       background-color: #89b4fa;
       color: #11111b;
-      padding: 8px 14px;
+      padding: 9px 14px;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>⚡ Campus C Lab <span class="badge">INTERACTIVE</span></h1>
+    <h1>⚡ Campus C Lab <span class="badge">LIVE GCC</span></h1>
     <div class="btn-group">
       <button id="clearBtn" onclick="clearTerminal()">Clear</button>
       <button id="runBtn" onclick="startExecution()">▶ Run</button>
     </div>
   </header>
 
-  <!-- TOP: Code Editor -->
+  <!-- TOP: Colorful Code Editor -->
   <div class="editor-container">
     <div class="section-label">
-      <span>main.c (Code Editor)</span>
+      <span>main.c (Colorful Editor)</span>
       <span>By SP</span>
     </div>
-    <textarea id="codeEditor" spellcheck="false">#include <stdio.h>
+    <textarea id="codeEditor">#include <stdio.h>
 
 int main() {
     int a, b, sum;
@@ -206,8 +206,8 @@ int main() {
   <!-- BOTTOM: Interactive Step-by-Step Terminal -->
   <div class="terminal-container" onclick="focusInput()">
     <div class="section-label">
-      <span>Terminal Output (Live Input)</span>
-      <span id="statusText">Ready</span>
+      <span>Terminal Output</span>
+      <span id="statusText" style="color: #89b4fa;">Ready</span>
     </div>
     <div id="terminalOutput">▶ 'Run' dabane ke baad yahan ek-ek karke output aayega aur neeche input box me aap value dal sakte hain...</div>
     <div class="input-bar">
@@ -218,7 +218,16 @@ int main() {
   </div>
 
   <script>
-    const codeEditor = document.getElementById('codeEditor');
+    // Initialize Colorful C Code Editor
+    const editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+      mode: 'text/x-csrc',
+      theme: 'dracula',
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4,
+      lineWrapping: true
+    });
+
     const terminalOutput = document.getElementById('terminalOutput');
     const termInput = document.getElementById('termInput');
     const sendInputBtn = document.getElementById('sendInputBtn');
@@ -247,6 +256,12 @@ int main() {
       }
     });
 
+    // Automatically inject unbuffered stdout so printf shows BEFORE scanf!
+    function prepareCodeForLiveOutput(rawCode) {
+      const helper = `\n#include <stdio.h>\n__attribute__((constructor)) void _sp_unbuffer() { setbuf(stdout, NULL); }\n`;
+      return helper + rawCode;
+    }
+
     async function startExecution() {
       collectedInputs = [];
       lastShownLength = 0;
@@ -258,8 +273,8 @@ int main() {
     }
 
     async function executeStep() {
-      const code = codeEditor.value;
-      // Add trailing newline so scanf finishes reading current tokens
+      const userCode = editor.getValue();
+      const executableCode = prepareCodeForLiveOutput(userCode);
       const stdinPayload = collectedInputs.length > 0 ? collectedInputs.join('\n') + '\n' : '';
 
       try {
@@ -269,7 +284,7 @@ int main() {
           body: JSON.stringify({
             language: 'c',
             version: '10.2.0',
-            files: [{ name: 'main.c', content: code }],
+            files: [{ name: 'main.c', content: executableCode }],
             stdin: stdinPayload,
             run_timeout: 3000
           })
@@ -277,9 +292,9 @@ int main() {
 
         const data = await response.json();
 
-        // Check compilation error
         if (data.compile && data.compile.code !== 0) {
-          terminalOutput.innerHTML = '<span class="error-text">Compilation Error:\n' + escapeHtml(data.compile.stderr || data.compile.output) + '</span>';
+          let errMsg = (data.compile.stderr || data.compile.output || '').replace(/main\.c:\d+:\d+:/g, 'Line:');
+          terminalOutput.innerHTML = '<span class="error-text">Compilation Error:\n' + escapeHtml(errMsg) + '</span>';
           finishExecution('Error');
           return;
         }
@@ -288,12 +303,10 @@ int main() {
         const runErr = data.run ? (data.run.stderr || '') : '';
         const exitCode = data.run ? data.run.code : 0;
 
-        // First step: clear "Compiling..." text
         if (collectedInputs.length === 0) {
           terminalOutput.innerHTML = '';
         }
 
-        // Append only the newly produced output since the last input step
         if (runOut.length > lastShownLength) {
           const newChunk = runOut.substring(lastShownLength);
           terminalOutput.innerHTML += escapeHtml(newChunk);
@@ -306,14 +319,11 @@ int main() {
 
         terminalOutput.scrollTop = terminalOutput.scrollHeight;
 
-        // Check if program is waiting for more scanf input or finished
-        // Detect if more scanf calls remain compared to inputs given
-        const scanfCount = (code.match(/\bscanf\s*\(/g) || []).length;
-        const hasLoop = /\b(for|while)\b/.test(code);
+        const scanfCount = (userCode.match(/\bscanf\s*\(/g) || []).length;
+        const hasLoop = /\b(for|while)\b/.test(userCode);
 
-        if ((collectedInputs.length < scanfCount || (hasLoop && exitCode === 0 && collectedInputs.length < 25)) && !runErr && !isLikelyFinished(runOut, code)) {
-          // Wait for next user input in terminal
-          statusText.textContent = 'Waiting for input...';
+        if ((collectedInputs.length < scanfCount || (hasLoop && exitCode === 0 && collectedInputs.length < 30)) && !runErr && !isLikelyFinished(runOut)) {
+          statusText.textContent = 'Enter Input ↓';
           termInput.disabled = false;
           sendInputBtn.disabled = false;
           termInput.value = '';
@@ -325,13 +335,12 @@ int main() {
         }
 
       } catch (err) {
-        terminalOutput.innerHTML += '\n<span class="error-text">Network Error: Compiler server se connect nahi ho paya.</span>';
+        terminalOutput.innerHTML += '\n<span class="error-text">Network Error: Server se connect nahi ho paya.</span>';
         finishExecution('Failed');
       }
     }
 
-    function isLikelyFinished(output, code) {
-      // If output ends with common final result patterns or has no trailing prompt
+    function isLikelyFinished(output) {
       const lines = output.trim().split('\n');
       const lastLine = lines[lines.length - 1] || '';
       if (output.endsWith('\n') && !/[:?=>]\s*$/.test(lastLine)) {
@@ -344,7 +353,6 @@ int main() {
       if (!isRunning || termInput.disabled) return;
       const val = termInput.value;
       
-      // Show user's typed input inside terminal just like a real shell
       terminalOutput.innerHTML += '<span class="user-typed">' + escapeHtml(val) + '</span>\n';
       terminalOutput.scrollTop = terminalOutput.scrollHeight;
 
