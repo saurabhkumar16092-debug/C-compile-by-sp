@@ -6,76 +6,369 @@
 
   <meta name="google-site-verification" content="PnEzym5TDHD1qt3sfGdv5199iC9TrZ78o5uynPiIC-k" />
 
-  <title>Campus C Lab by SP - Free Online Interactive C Compiler</title>
-  <meta name="description" content="Campus C Lab by SP is a fast, free interactive online C compiler for B.Tech students to write, compile, and run C programs with live terminal input on mobile and desktop." />
+  <title>Campus C Lab by SP - Interactive Online C Compiler</title>
+  <meta name="description" content="Campus C Lab by SP is a free interactive online C compiler for B.Tech students with step-by-step live terminal input on mobile and desktop." />
   <meta name="keywords" content="Campus C Lab, Campus C Lab by SP, C compile by sp, interactive C compiler, online C terminal, saurabhkumar16092-debug" />
   <meta name="author" content="SP (Saurabh Kumar)" />
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: #11111b;
       color: #cdd6f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       flex-direction: column;
       height: 100vh;
+      height: 100dvh;
       overflow: hidden;
     }
     header {
       background-color: #181825;
-      padding: 10px 16px;
+      padding: 10px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #313244;
+      border-bottom: 1px solid #313244;
     }
     header h1 {
-      font-size: 17px;
+      font-size: 16px;
       color: #89b4fa;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     .badge {
       background-color: #a6e3a1;
       color: #11111b;
       font-size: 10px;
-      padding: 2px 7px;
-      border-radius: 10px;
+      padding: 2px 6px;
+      border-radius: 8px;
       font-weight: bold;
     }
-    .tip-bar {
-      background-color: #1e1e2e;
-      color: #f9e2af;
-      font-size: 12px;
-      padding: 6px 14px;
-      border-bottom: 1px solid #313244;
-      text-align: center;
+    .btn-group {
+      display: flex;
+      gap: 8px;
     }
-    .compiler-frame {
+    button {
+      border: none;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    #runBtn {
+      background-color: #a6e3a1;
+      color: #11111b;
+    }
+    #runBtn:disabled {
+      background-color: #585b70;
+      color: #cdd6f4;
+    }
+    #clearBtn {
+      background-color: #313244;
+      color: #cdd6f4;
+    }
+
+    /* Top Editor Section */
+    .editor-container {
+      flex: 1.1;
+      display: flex;
+      flex-direction: column;
+      border-bottom: 2px solid #45475a;
+      min-height: 0;
+    }
+    .section-label {
+      background-color: #1e1e2e;
+      color: #a6adc8;
+      font-size: 11px;
+      padding: 4px 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+    }
+    textarea#codeEditor {
       flex: 1;
       width: 100%;
+      background-color: #1e1e2e;
+      color: #f8f8f2;
       border: none;
+      padding: 12px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+      tab-size: 4;
+    }
+
+    /* Bottom Interactive Terminal Section */
+    .terminal-container {
+      flex: 0.9;
+      display: flex;
+      flex-direction: column;
+      background-color: #0b0b12;
+      min-height: 0;
+    }
+    #terminalOutput {
+      flex: 1;
+      padding: 10px 12px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      line-height: 1.45;
+      color: #a6e3a1;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .user-typed {
+      color: #89dceb;
+      font-weight: bold;
+    }
+    .error-text {
+      color: #f38ba8;
+    }
+    .system-text {
+      color: #f9e2af;
+      font-style: italic;
+    }
+
+    /* Live Input Bar inside Terminal */
+    .input-bar {
+      display: flex;
+      background-color: #181825;
+      border-top: 1px solid #313244;
+      padding: 6px 8px;
+      gap: 6px;
+      align-items: center;
+    }
+    .prompt-symbol {
+      color: #a6e3a1;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 15px;
+    }
+    #termInput {
+      flex: 1;
+      background-color: #11111b;
+      color: #ffffff;
+      border: 1px solid #45475a;
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      outline: none;
+    }
+    #termInput:focus {
+      border-color: #89b4fa;
+    }
+    #sendInputBtn {
+      background-color: #89b4fa;
+      color: #11111b;
+      padding: 8px 14px;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>⚡ Campus C Lab <span class="badge">LIVE GCC</span></h1>
-    <span style="font-size: 12px; color: #a6adc8;">By SP</span>
+    <h1>⚡ Campus C Lab <span class="badge">INTERACTIVE</span></h1>
+    <div class="btn-group">
+      <button id="clearBtn" onclick="clearTerminal()">Clear</button>
+      <button id="runBtn" onclick="startExecution()">▶ Run</button>
+    </div>
   </header>
 
-  <div class="tip-bar">
-    💡 Tip: नीचे <b>Output / STDIN</b> बॉक्स में टच करके सीधे कीबोर्ड से इनपुट लिखें और <b>Run</b> दबाएं।
+  <!-- TOP: Code Editor -->
+  <div class="editor-container">
+    <div class="section-label">
+      <span>main.c (Code Editor)</span>
+      <span>By SP</span>
+    </div>
+    <textarea id="codeEditor" spellcheck="false">#include <stdio.h>
+
+int main() {
+    int a, b, sum;
+    printf("Pehla number enter karein: ");
+    scanf("%d", &a);
+    
+    printf("Doosra number enter karein: ");
+    scanf("%d", &b);
+    
+    sum = a + b;
+    printf("\nDono numbers ka jod = %d\n", sum);
+    return 0;
+}</textarea>
   </div>
 
-  <iframe 
-    class="compiler-frame" 
-    src="https://onecompiler.com/embed/c?theme=dark&hideNew=true&hideNewFileOption=true&hideTitle=true" 
-    allow="clipboard-write"
-    title="Campus C Interactive Compiler">
-  </iframe>
+  <!-- BOTTOM: Interactive Step-by-Step Terminal -->
+  <div class="terminal-container" onclick="focusInput()">
+    <div class="section-label">
+      <span>Terminal Output (Live Input)</span>
+      <span id="statusText">Ready</span>
+    </div>
+    <div id="terminalOutput">▶ 'Run' dabane ke baad yahan ek-ek karke output aayega aur neeche input box me aap value dal sakte hain...</div>
+    <div class="input-bar">
+      <span class="prompt-symbol">&gt;</span>
+      <input type="text" id="termInput" placeholder="Yahan input likhein aur Enter dabaein..." disabled />
+      <button id="sendInputBtn" onclick="submitStepInput()" disabled>Enter ↵</button>
+    </div>
+  </div>
+
+  <script>
+    const codeEditor = document.getElementById('codeEditor');
+    const terminalOutput = document.getElementById('terminalOutput');
+    const termInput = document.getElementById('termInput');
+    const sendInputBtn = document.getElementById('sendInputBtn');
+    const runBtn = document.getElementById('runBtn');
+    const statusText = document.getElementById('statusText');
+
+    let collectedInputs = [];
+    let isRunning = false;
+    let lastShownLength = 0;
+
+    function focusInput() {
+      if (!termInput.disabled) {
+        termInput.focus();
+      }
+    }
+
+    function clearTerminal() {
+      terminalOutput.innerHTML = '';
+      statusText.textContent = 'Ready';
+    }
+
+    termInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitStepInput();
+      }
+    });
+
+    async function startExecution() {
+      collectedInputs = [];
+      lastShownLength = 0;
+      isRunning = true;
+      terminalOutput.innerHTML = '<span class="system-text">Compiling & running...</span>\n';
+      runBtn.disabled = true;
+      statusText.textContent = 'Running...';
+      await executeStep();
+    }
+
+    async function executeStep() {
+      const code = codeEditor.value;
+      // Add trailing newline so scanf finishes reading current tokens
+      const stdinPayload = collectedInputs.length > 0 ? collectedInputs.join('\n') + '\n' : '';
+
+      try {
+        const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            language: 'c',
+            version: '10.2.0',
+            files: [{ name: 'main.c', content: code }],
+            stdin: stdinPayload,
+            run_timeout: 3000
+          })
+        });
+
+        const data = await response.json();
+
+        // Check compilation error
+        if (data.compile && data.compile.code !== 0) {
+          terminalOutput.innerHTML = '<span class="error-text">Compilation Error:\n' + escapeHtml(data.compile.stderr || data.compile.output) + '</span>';
+          finishExecution('Error');
+          return;
+        }
+
+        const runOut = data.run ? (data.run.stdout || '') : '';
+        const runErr = data.run ? (data.run.stderr || '') : '';
+        const exitCode = data.run ? data.run.code : 0;
+
+        // First step: clear "Compiling..." text
+        if (collectedInputs.length === 0) {
+          terminalOutput.innerHTML = '';
+        }
+
+        // Append only the newly produced output since the last input step
+        if (runOut.length > lastShownLength) {
+          const newChunk = runOut.substring(lastShownLength);
+          terminalOutput.innerHTML += escapeHtml(newChunk);
+          lastShownLength = runOut.length;
+        }
+
+        if (runErr) {
+          terminalOutput.innerHTML += '\n<span class="error-text">' + escapeHtml(runErr) + '</span>';
+        }
+
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+
+        // Check if program is waiting for more scanf input or finished
+        // Detect if more scanf calls remain compared to inputs given
+        const scanfCount = (code.match(/\bscanf\s*\(/g) || []).length;
+        const hasLoop = /\b(for|while)\b/.test(code);
+
+        if ((collectedInputs.length < scanfCount || (hasLoop && exitCode === 0 && collectedInputs.length < 25)) && !runErr && !isLikelyFinished(runOut, code)) {
+          // Wait for next user input in terminal
+          statusText.textContent = 'Waiting for input...';
+          termInput.disabled = false;
+          sendInputBtn.disabled = false;
+          termInput.value = '';
+          termInput.focus();
+        } else {
+          terminalOutput.innerHTML += '\n\n<span class="system-text">--- Program Finished (Exit Code: ' + exitCode + ') ---</span>';
+          terminalOutput.scrollTop = terminalOutput.scrollHeight;
+          finishExecution('Finished');
+        }
+
+      } catch (err) {
+        terminalOutput.innerHTML += '\n<span class="error-text">Network Error: Compiler server se connect nahi ho paya.</span>';
+        finishExecution('Failed');
+      }
+    }
+
+    function isLikelyFinished(output, code) {
+      // If output ends with common final result patterns or has no trailing prompt
+      const lines = output.trim().split('\n');
+      const lastLine = lines[lines.length - 1] || '';
+      if (output.endsWith('\n') && !/[:?=>]\s*$/.test(lastLine)) {
+        return true;
+      }
+      return false;
+    }
+
+    async function submitStepInput() {
+      if (!isRunning || termInput.disabled) return;
+      const val = termInput.value;
+      
+      // Show user's typed input inside terminal just like a real shell
+      terminalOutput.innerHTML += '<span class="user-typed">' + escapeHtml(val) + '</span>\n';
+      terminalOutput.scrollTop = terminalOutput.scrollHeight;
+
+      collectedInputs.push(val);
+      termInput.value = '';
+      termInput.disabled = true;
+      sendInputBtn.disabled = true;
+      statusText.textContent = 'Running...';
+
+      await executeStep();
+    }
+
+    function finishExecution(status) {
+      isRunning = false;
+      runBtn.disabled = false;
+      termInput.disabled = true;
+      sendInputBtn.disabled = true;
+      statusText.textContent = status;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+  </script>
 
 </body>
 </html>
