@@ -11,7 +11,6 @@
   <meta name="keywords" content="Campus C Lab, Campus C Lab by SP, C compile by sp, interactive C compiler, online C terminal, saurabhkumar16092-debug" />
   <meta name="author" content="SP (Saurabh Kumar)" />
 
-  <!-- VS Code Style Colorful Syntax Highlighting (CodeMirror) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
@@ -38,7 +37,7 @@
       border-bottom: 1px solid #313244;
     }
     header h1 {
-      font-size: 16px;
+      font-size: 17px;
       color: #89b4fa;
       display: flex;
       align-items: center;
@@ -61,7 +60,7 @@
       padding: 8px 14px;
       border-radius: 6px;
       font-weight: bold;
-      font-size: 13px;
+      font-size: 14px;
       cursor: pointer;
     }
     #runBtn {
@@ -79,7 +78,7 @@
 
     /* Top Colorful Editor Section */
     .editor-container {
-      flex: 1.15;
+      flex: 1.1;
       display: flex;
       flex-direction: column;
       border-bottom: 2px solid #45475a;
@@ -88,7 +87,7 @@
     .section-label {
       background-color: #1e1e2e;
       color: #a6adc8;
-      font-size: 11px;
+      font-size: 12px;
       padding: 5px 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -100,13 +99,13 @@
       flex: 1;
       height: 100% !important;
       font-family: 'Courier New', Courier, monospace;
-      font-size: 14px;
+      font-size: 15px;
       line-height: 1.5;
     }
 
     /* Bottom Interactive Terminal Section */
     .terminal-container {
-      flex: 0.85;
+      flex: 0.9;
       display: flex;
       flex-direction: column;
       background-color: #0b0b12;
@@ -114,9 +113,9 @@
     }
     #terminalOutput {
       flex: 1;
-      padding: 10px 12px;
+      padding: 12px;
       font-family: 'Courier New', Courier, monospace;
-      font-size: 14px;
+      font-size: 15px;
       line-height: 1.5;
       color: #a6e3a1;
       overflow-y: auto;
@@ -148,7 +147,7 @@
       color: #a6e3a1;
       font-family: monospace;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 17px;
     }
     #termInput {
       flex: 1;
@@ -156,9 +155,9 @@
       color: #ffffff;
       border: 1px solid #45475a;
       border-radius: 6px;
-      padding: 9px 10px;
+      padding: 10px;
       font-family: 'Courier New', Courier, monospace;
-      font-size: 14px;
+      font-size: 15px;
       outline: none;
     }
     #termInput:focus {
@@ -167,7 +166,7 @@
     #sendInputBtn {
       background-color: #89b4fa;
       color: #11111b;
-      padding: 9px 14px;
+      padding: 10px 16px;
     }
   </style>
 </head>
@@ -181,10 +180,9 @@
     </div>
   </header>
 
-  <!-- TOP: Colorful Code Editor -->
   <div class="editor-container">
     <div class="section-label">
-      <span>main.c (Colorful Editor)</span>
+      <span>main.c</span>
       <span>By SP</span>
     </div>
     <textarea id="codeEditor">#include <stdio.h>
@@ -203,7 +201,6 @@ int main() {
 }</textarea>
   </div>
 
-  <!-- BOTTOM: Interactive Step-by-Step Terminal -->
   <div class="terminal-container" onclick="focusInput()">
     <div class="section-label">
       <span>Terminal Output</span>
@@ -218,7 +215,6 @@ int main() {
   </div>
 
   <script>
-    // Initialize Colorful C Code Editor
     const editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
       mode: 'text/x-csrc',
       theme: 'dracula',
@@ -234,14 +230,13 @@ int main() {
     const runBtn = document.getElementById('runBtn');
     const statusText = document.getElementById('statusText');
 
+    let promptsQueue = [];
     let collectedInputs = [];
+    let currentStep = 0;
     let isRunning = false;
-    let lastShownLength = 0;
 
     function focusInput() {
-      if (!termInput.disabled) {
-        termInput.focus();
-      }
+      if (!termInput.disabled) termInput.focus();
     }
 
     function clearTerminal() {
@@ -256,25 +251,86 @@ int main() {
       }
     });
 
-    // Automatically inject unbuffered stdout so printf shows BEFORE scanf!
-    function prepareCodeForLiveOutput(rawCode) {
-      const helper = `\n#include <stdio.h>\n__attribute__((constructor)) void _sp_unbuffer() { setbuf(stdout, NULL); }\n`;
-      return helper + rawCode;
+    // Extract printf prompts before each scanf so user sees exact prompt immediately!
+    function extractInteractiveSteps(code) {
+      // Remove comments
+      const clean = code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+      const steps = [];
+      const stmtRegex = /\b(printf|scanf)\s*\(([^;]*)\)\s*;/g;
+      let match;
+      let pendingText = '';
+
+      while ((match = stmtRegex.exec(clean)) !== null) {
+        const fn = match[1];
+        const args = match[2];
+        if (fn === 'printf') {
+          const strMatch = args.match(/^\s*"((?:[^"\\]|\\.)*)"/);
+          if (strMatch && !/%[sdfclux]/i.test(strMatch[1])) {
+            pendingText += strMatch[1]
+              .replace(/\\n/g, '\n')
+              .replace(/\\t/g, '\t')
+              .replace(/\\"/g, '"');
+          }
+        } else if (fn === 'scanf') {
+          steps.push(pendingText || 'Enter input: ');
+          pendingText = '';
+        }
+      }
+      return steps;
     }
 
     async function startExecution() {
+      const code = editor.getValue();
       collectedInputs = [];
-      lastShownLength = 0;
+      currentStep = 0;
       isRunning = true;
-      terminalOutput.innerHTML = '<span class="system-text">Compiling & running...</span>\n';
+      terminalOutput.innerHTML = '';
       runBtn.disabled = true;
-      statusText.textContent = 'Running...';
-      await executeStep();
+
+      promptsQueue = extractInteractiveSteps(code);
+
+      if (promptsQueue.length > 0) {
+        showNextPrompt();
+      } else {
+        await compileAndRunFinal();
+      }
     }
 
-    async function executeStep() {
-      const userCode = editor.getValue();
-      const executableCode = prepareCodeForLiveOutput(userCode);
+    function showNextPrompt() {
+      const promptMsg = promptsQueue[currentStep];
+      terminalOutput.innerHTML += escapeHtml(promptMsg);
+      terminalOutput.scrollTop = terminalOutput.scrollHeight;
+
+      statusText.textContent = 'Enter Input ↓';
+      termInput.disabled = false;
+      sendInputBtn.disabled = false;
+      termInput.value = '';
+      termInput.focus();
+    }
+
+    async function submitStepInput() {
+      if (!isRunning || termInput.disabled) return;
+      const val = termInput.value;
+
+      terminalOutput.innerHTML += '<span class="user-typed">' + escapeHtml(val) + '</span>\n';
+      terminalOutput.scrollTop = terminalOutput.scrollHeight;
+
+      collectedInputs.push(val);
+      currentStep++;
+      termInput.value = '';
+      termInput.disabled = true;
+      sendInputBtn.disabled = true;
+
+      if (currentStep < promptsQueue.length) {
+        showNextPrompt();
+      } else {
+        await compileAndRunFinal();
+      }
+    }
+
+    async function compileAndRunFinal() {
+      statusText.textContent = 'Compiling & Running...';
+      const code = editor.getValue();
       const stdinPayload = collectedInputs.length > 0 ? collectedInputs.join('\n') + '\n' : '';
 
       try {
@@ -284,85 +340,47 @@ int main() {
           body: JSON.stringify({
             language: 'c',
             version: '10.2.0',
-            files: [{ name: 'main.c', content: executableCode }],
+            files: [{ name: 'main.c', content: code }],
             stdin: stdinPayload,
-            run_timeout: 3000
+            run_timeout: 4000
           })
         });
 
         const data = await response.json();
 
         if (data.compile && data.compile.code !== 0) {
-          let errMsg = (data.compile.stderr || data.compile.output || '').replace(/main\.c:\d+:\d+:/g, 'Line:');
-          terminalOutput.innerHTML = '<span class="error-text">Compilation Error:\n' + escapeHtml(errMsg) + '</span>';
+          terminalOutput.innerHTML = '<span class="error-text">Compilation Error:\n' + escapeHtml(data.compile.stderr || data.compile.output) + '</span>';
           finishExecution('Error');
           return;
         }
 
-        const runOut = data.run ? (data.run.stdout || '') : '';
+        const fullOut = data.run ? (data.run.stdout || '') : '';
         const runErr = data.run ? (data.run.stderr || '') : '';
         const exitCode = data.run ? data.run.code : 0;
 
-        if (collectedInputs.length === 0) {
-          terminalOutput.innerHTML = '';
+        // Remove already-printed prompt prefixes from final stdout so only remaining output prints cleanly
+        let remainingOut = fullOut;
+        for (const p of promptsQueue) {
+          if (remainingOut.startsWith(p)) {
+            remainingOut = remainingOut.substring(p.length);
+          }
         }
 
-        if (runOut.length > lastShownLength) {
-          const newChunk = runOut.substring(lastShownLength);
-          terminalOutput.innerHTML += escapeHtml(newChunk);
-          lastShownLength = runOut.length;
+        if (remainingOut) {
+          terminalOutput.innerHTML += escapeHtml(remainingOut);
         }
-
         if (runErr) {
           terminalOutput.innerHTML += '\n<span class="error-text">' + escapeHtml(runErr) + '</span>';
         }
 
+        terminalOutput.innerHTML += '\n\n<span class="system-text">--- Program Finished (Exit Code: ' + exitCode + ') ---</span>';
         terminalOutput.scrollTop = terminalOutput.scrollHeight;
-
-        const scanfCount = (userCode.match(/\bscanf\s*\(/g) || []).length;
-        const hasLoop = /\b(for|while)\b/.test(userCode);
-
-        if ((collectedInputs.length < scanfCount || (hasLoop && exitCode === 0 && collectedInputs.length < 30)) && !runErr && !isLikelyFinished(runOut)) {
-          statusText.textContent = 'Enter Input ↓';
-          termInput.disabled = false;
-          sendInputBtn.disabled = false;
-          termInput.value = '';
-          termInput.focus();
-        } else {
-          terminalOutput.innerHTML += '\n\n<span class="system-text">--- Program Finished (Exit Code: ' + exitCode + ') ---</span>';
-          terminalOutput.scrollTop = terminalOutput.scrollHeight;
-          finishExecution('Finished');
-        }
+        finishExecution('Finished');
 
       } catch (err) {
         terminalOutput.innerHTML += '\n<span class="error-text">Network Error: Server se connect nahi ho paya.</span>';
         finishExecution('Failed');
       }
-    }
-
-    function isLikelyFinished(output) {
-      const lines = output.trim().split('\n');
-      const lastLine = lines[lines.length - 1] || '';
-      if (output.endsWith('\n') && !/[:?=>]\s*$/.test(lastLine)) {
-        return true;
-      }
-      return false;
-    }
-
-    async function submitStepInput() {
-      if (!isRunning || termInput.disabled) return;
-      const val = termInput.value;
-      
-      terminalOutput.innerHTML += '<span class="user-typed">' + escapeHtml(val) + '</span>\n';
-      terminalOutput.scrollTop = terminalOutput.scrollHeight;
-
-      collectedInputs.push(val);
-      termInput.value = '';
-      termInput.disabled = true;
-      sendInputBtn.disabled = true;
-      statusText.textContent = 'Running...';
-
-      await executeStep();
     }
 
     function finishExecution(status) {
