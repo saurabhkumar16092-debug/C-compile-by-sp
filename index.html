@@ -131,6 +131,10 @@
       color: #f9e2af;
       font-style: italic;
     }
+    .hint-text {
+      color: #94e2d5;
+      font-size: 13px;
+    }
 
     .input-bar {
       display: flex;
@@ -185,15 +189,33 @@
     <textarea id="codeEditor">#include <stdio.h>
 
 int main() {
-    int a, b, sum;
-    printf("Pehla number enter karein: ");
-    scanf("%d", &a);
-    
-    printf("Doosra number enter karein: ");
-    scanf("%d", &b);
-    
-    sum = a + b;
-    printf("\nDono numbers ka jod = %d\n", sum);
+    int r, c, i, j;
+    int A[10][10], B[10][10], sum[10][10];
+
+    printf("Rows aur columns enter karein: ");
+    scanf("%d %d", &r, &c);
+
+    printf("Pehli matrix ke elements enter karein:\n");
+    for (i = 0; i < r; i++)
+        for (j = 0; j < c; j++)
+            scanf("%d", &A[i][j]);
+
+    printf("Doosri matrix ke elements enter karein:\n");
+    for (i = 0; i < r; i++)
+        for (j = 0; j < c; j++)
+            scanf("%d", &B[i][j]);
+
+    for (i = 0; i < r; i++)
+        for (j = 0; j < c; j++)
+            sum[i][j] = A[i][j] + B[i][j];
+
+    printf("Matrices ka jod:\n");
+    for (i = 0; i < r; i++) {
+        for (j = 0; j < c; j++)
+            printf("%d\t", sum[i][j]);
+        printf("\n");
+    }
+
     return 0;
 }</textarea>
   </div>
@@ -227,10 +249,12 @@ int main() {
     const runBtn = document.getElementById('runBtn');
     const statusText = document.getElementById('statusText');
 
-    let promptsQueue = [];
-    let collectedInputs = [];
-    let currentStep = 0;
+    let scanGroups = [];
+    let collectedTokens = [];
+    let currentGroupIdx = 0;
+    let tokensCollectedInGroup = 0;
     let isRunning = false;
+    let knownVars = {};
 
     function focusInput() {
       if (!termInput.disabled) termInput.focus();
@@ -248,88 +272,186 @@ int main() {
       }
     });
 
-    function extractInteractiveSteps(code) {
+    // Smart analyzer: detects scanf format specifiers (%d %d), variable names, and enclosing loops!
+    function analyzeCodeInputSteps(code) {
       const clean = code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
-      const steps = [];
-      const stmtRegex = /\b(printf|scanf)\s*\(([^;]*)\)\s*;/g;
-      let match;
-      let pendingText = '';
+      const groups = [];
+      let pendingPrompt = '';
 
-      while ((match = stmtRegex.exec(clean)) !== null) {
-        const fn = match[1];
-        const args = match[2];
-        if (fn === 'printf') {
-          const strMatch = args.match(/^\s*"((?:[^"\\]|\\.)*)"/);
-          if (strMatch && !/%[sdfclux]/i.test(strMatch[1])) {
-            pendingText += strMatch[1]
-              .replace(/\\n/g, '\n')
-              .replace(/\\t/g, '\t')
-              .replace(/\\"/g, '"');
-          }
-        } else if (fn === 'scanf') {
-          steps.push(pendingText || 'Enter input: ');
-          pendingText = '';
+      // Track loop context before each scanf
+      const lines = clean.split('\n');
+      let activeLoops = []; // stack of loop bounds
+
+      for (let idx = 0; idx < lines.length; idx++) {
+        const line = lines[idx].trim();
+
+        // Detect for-loop bound like: for (i = 0; i < r; i++) or for (int i = 0; i < 5; i++)
+        const forMatch = line.match(/\bfor\s*\([^;]*;\s*[a-zA-Z_]\w*\s*(<=|<)\s*([a-zA-Z0-9_]+)\s*;/);
+        if (forMatch) {
+          const op = forMatch[1];
+          const bound = forMatch[2];
+          activeLoops.push({ op, bound, lineIdx: idx });
+        }
+
+        // Detect printf prompt
+        const printfMatch = line.match(/\bprintf\s*\(\s*"((?:[^"\\]|\\.)*)"\s*\)\s*;/);
+        if (printfMatch && !/%[sdfclux]/i.test(printfMatch[1])) {
+          pendingPrompt += printfMatch[1]
+            .replace(/\\n/g, '\n')
+            .replace(/\\t/g, '\t')
+            .replace(/\\"/g, '"');
+        }
+
+        // Detect scanf
+        const scanfMatch = line.match(/\bscanf\s*\(\s*"([^"]*)"\s*,\s*([^)]+)\)/);
+        if (scanfMatch) {
+          const fmt = scanfMatch[1];
+          const varsRaw = scanfMatch[2];
+          const specifiers = fmt.match(/%[0-9.]*[diuoxXfFeEgGaAcsp]/g) || ['%d'];
+          const varNames = varsRaw.split(',').map(v => v.replace(/&/g, '').trim());
+
+          // Check recent loops within 4 lines above this scanf
+          const recentLoops = activeLoops.filter(l => idx - l.lineIdx <= 4);
+
+          groups.push({
+            prompt: pendingPrompt || 'Enter value: ',
+            perIterationCount: specifiers.length,
+            specifiers: specifiers,
+            varNames: varNames,
+            loops: recentLoops
+          });
+
+          pendingPrompt = '';
+          activeLoops = [];
         }
       }
-      return steps;
+      return groups;
+    }
+
+    function computeExpectedTokensForGroup(group) {
+      let multiplier = 1;
+      for (const lp of group.loops) {
+        let boundVal = parseInt(lp.bound, 10);
+        if (isNaN(boundVal)) {
+          boundVal = knownVars[lp.bound] !== undefined ? knownVars[lp.bound] : 1;
+        }
+        if (lp.op === '<=') boundVal += 1;
+        if (boundVal > 0) multiplier *= boundVal;
+      }
+      return group.perIterationCount * multiplier;
     }
 
     async function startExecution() {
       const code = editor.getValue();
-      collectedInputs = [];
-      currentStep = 0;
+      collectedTokens = [];
+      currentGroupIdx = 0;
+      tokensCollectedInGroup = 0;
+      knownVars = {};
       isRunning = true;
       terminalOutput.innerHTML = '';
       runBtn.disabled = true;
 
-      promptsQueue = extractInteractiveSteps(code);
+      scanGroups = analyzeCodeInputSteps(code);
 
-      if (promptsQueue.length > 0) {
-        showNextPrompt();
+      if (scanGroups.length > 0) {
+        showCurrentGroupPrompt(true);
       } else {
         await compileAndRunFinal();
       }
     }
 
-    function showNextPrompt() {
-      const promptMsg = promptsQueue[currentStep];
-      terminalOutput.innerHTML += escapeHtml(promptMsg);
+    function showCurrentGroupPrompt(isFirstShow) {
+      const grp = scanGroups[currentGroupIdx];
+      const totalNeeded = computeExpectedTokensForGroup(grp);
+      const remaining = totalNeeded - tokensCollectedInGroup;
+
+      if (isFirstShow) {
+        terminalOutput.innerHTML += escapeHtml(grp.prompt);
+      } else {
+        terminalOutput.innerHTML += `<span class="hint-text">↳ Bache hue ${remaining} element(s) enter karein: </span>`;
+      }
       terminalOutput.scrollTop = terminalOutput.scrollHeight;
 
-      statusText.textContent = 'Enter Input ↓';
+      statusText.textContent = `Input (${tokensCollectedInGroup}/${totalNeeded})`;
       termInput.disabled = false;
       sendInputBtn.disabled = false;
       termInput.value = '';
+      termInput.placeholder = totalNeeded > 1
+        ? `${remaining} value(s) bache hain (ek-ek karke ya space dekar likhein)...`
+        : `Value likhein aur Enter dabaein...`;
       termInput.focus();
     }
 
     async function submitStepInput() {
       if (!isRunning || termInput.disabled) return;
-      const val = termInput.value;
+      const raw = termInput.value.trim();
 
-      terminalOutput.innerHTML += '<span class="user-typed">' + escapeHtml(val) + '</span>\n';
+      if (raw === '') {
+        terminalOutput.innerHTML += `\n<span class="error-text">⚠ Error: Khali input nahi chalega! Kripya value enter karein: </span>`;
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        termInput.focus();
+        return;
+      }
+
+      const grp = scanGroups[currentGroupIdx];
+      const totalNeeded = computeExpectedTokensForGroup(grp);
+      const newTokens = raw.split(/\s+/);
+
+      // Validate numeric types if %d / %f expected
+      for (let i = 0; i < newTokens.length; i++) {
+        const specIndex = (tokensCollectedInGroup + i) % grp.specifiers.length;
+        const spec = grp.specifiers[specIndex];
+        if (/%[diu]/i.test(spec) && !/^-?\d+$/.test(newTokens[i])) {
+          terminalOutput.innerHTML += `<span class="user-typed">${escapeHtml(raw)}</span>\n<span class="error-text">⚠ Type Error: '${escapeHtml(newTokens[i])}' ek integer (%d) nahi hai! Dobara sahi number enter karein: </span>`;
+          terminalOutput.scrollTop = terminalOutput.scrollHeight;
+          termInput.value = '';
+          termInput.focus();
+          return;
+        }
+      }
+
+      // Show user typed input
+      terminalOutput.innerHTML += `<span class="user-typed">${escapeHtml(raw)}</span>\n`;
       terminalOutput.scrollTop = terminalOutput.scrollHeight;
 
-      collectedInputs.push(val);
-      currentStep++;
+      // Save variable values (like r = 2, c = 2) so loop bounds know exact count!
+      if (grp.loops.length === 0) {
+        newTokens.forEach((tok, idx) => {
+          const vName = grp.varNames[tokensCollectedInGroup + idx];
+          if (vName && !isNaN(parseInt(tok, 10))) {
+            knownVars[vName] = parseInt(tok, 10);
+          }
+        });
+      }
+
+      collectedTokens.push(...newTokens);
+      tokensCollectedInGroup += newTokens.length;
+
       termInput.value = '';
       termInput.disabled = true;
       sendInputBtn.disabled = true;
 
-      if (currentStep < promptsQueue.length) {
-        showNextPrompt();
+      if (tokensCollectedInGroup < totalNeeded) {
+        // Still waiting for remaining elements of this matrix/loop!
+        showCurrentGroupPrompt(false);
       } else {
-        await compileAndRunFinal();
+        // Move to next scanf / next matrix
+        currentGroupIdx++;
+        tokensCollectedInGroup = 0;
+        if (currentGroupIdx < scanGroups.length) {
+          showCurrentGroupPrompt(true);
+        } else {
+          await compileAndRunFinal();
+        }
       }
     }
 
     async function compileAndRunFinal() {
       statusText.textContent = 'Compiling & Running...';
       const code = editor.getValue();
-      const stdinPayload = collectedInputs.length > 0 ? collectedInputs.join('\n') + '\n' : '';
+      const stdinPayload = collectedTokens.length > 0 ? collectedTokens.join('\n') + '\n' : '';
 
       try {
-        // Free, reliable GCC API (Wandbox) - no API key required
         const response = await fetch('https://wandbox.org/api/compile.json', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -343,7 +465,6 @@ int main() {
 
         const data = await response.json();
 
-        // Check compilation error
         if (data.compiler_error) {
           terminalOutput.innerHTML = '<span class="error-text">Compilation Error:\n' + escapeHtml(data.compiler_error) + '</span>';
           finishExecution('Error');
@@ -354,11 +475,10 @@ int main() {
         const progErr = data.program_error || '';
         const exitCode = data.status !== undefined ? data.status : '0';
 
-        // Strip already-shown prompt texts from the beginning of program_output
         let remainingOut = fullOut;
-        for (const p of promptsQueue) {
-          if (remainingOut.startsWith(p)) {
-            remainingOut = remainingOut.substring(p.length);
+        for (const grp of scanGroups) {
+          if (remainingOut.startsWith(grp.prompt)) {
+            remainingOut = remainingOut.substring(grp.prompt.length);
           }
         }
 
@@ -384,6 +504,7 @@ int main() {
       runBtn.disabled = false;
       termInput.disabled = true;
       sendInputBtn.disabled = true;
+      termInput.placeholder = 'Yahan input likhein aur Enter dabaein...';
       statusText.textContent = status;
     }
 
