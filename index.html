@@ -11,10 +11,11 @@
   <meta name="keywords" content="Campus C Lab, Campus C Lab by SP, C compile by sp, interactive C compiler, online C terminal, saurabhkumar16092-debug" />
   <meta name="author" content="SP (Saurabh Kumar)" />
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <!-- Primary Fast CDN (jsDelivr) for CodeMirror -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/dracula.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/clike/clike.min.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -269,7 +270,7 @@
   <header>
     <h1>⚡ Campus C Lab</h1>
     <div class="btn-group">
-      <button id="historyBtn" onclick="openHistory()">🕒 History</button>
+      <button id="historyBtn" type="button" onclick="openHistory()">🕒 History</button>
       <select id="exampleSelect" onchange="loadExampleProgram()" title="Lab Programs">
         <option value="">📂 Examples</option>
         <option value="add">1. Add 2 Numbers</option>
@@ -277,8 +278,8 @@
         <option value="prime">3. Prime Number</option>
         <option value="fact">4. Factorial</option>
       </select>
-      <button id="clearBtn" onclick="clearTerminal()">Clear</button>
-      <button id="runBtn" onclick="startExecution()">▶ Run</button>
+      <button id="clearBtn" type="button" onclick="clearTerminal()">Clear</button>
+      <button id="runBtn" type="button" onclick="startExecution()">▶ Run</button>
     </div>
   </header>
 
@@ -308,7 +309,7 @@ int main() {
     <div class="input-bar">
       <span class="prompt-symbol">&gt;</span>
       <input type="text" id="termInput" placeholder="Yahan input likhein aur Enter dabaein..." disabled />
-      <button id="sendInputBtn" onclick="submitStepInput()" disabled>Enter ↵</button>
+      <button id="sendInputBtn" type="button" onclick="submitStepInput()" disabled>Enter ↵</button>
     </div>
   </div>
 
@@ -316,7 +317,7 @@ int main() {
     <div class="modal-box">
       <div class="modal-header">
         <h3>🕒 Pichle Programs (Saved History)</h3>
-        <button style="background:#f38ba8; color:#11111b; padding:4px 9px;" onclick="closeHistory()">✕</button>
+        <button type="button" style="background:#f38ba8; color:#11111b; padding:4px 9px;" onclick="closeHistory()">✕</button>
       </div>
       <div id="historyList"></div>
     </div>
@@ -333,15 +334,45 @@ int main() {
     const textareaEl = document.getElementById('codeEditor');
     let editor = null;
 
-    if (typeof CodeMirror !== 'undefined') {
-      editor = CodeMirror.fromTextArea(textareaEl, {
-        mode: 'text/x-csrc',
-        theme: 'dracula',
-        lineNumbers: true,
-        indentUnit: 4,
-        tabSize: 4,
-        lineWrapping: true
-      });
+    function initCodeMirrorEditor() {
+      if (typeof CodeMirror !== 'undefined' && !editor) {
+        const currentVal = textareaEl.value;
+        editor = CodeMirror.fromTextArea(textareaEl, {
+          mode: 'text/x-csrc',
+          theme: 'dracula',
+          lineNumbers: true,
+          indentUnit: 4,
+          tabSize: 4,
+          lineWrapping: true
+        });
+        editor.setValue(currentVal);
+        editor.on('change', onCodeChanged);
+      }
+    }
+
+    initCodeMirrorEditor();
+
+    // Backup CDN fallback if jsDelivr was slow
+    if (!editor) {
+      const fbCss = document.createElement('link');
+      fbCss.rel = 'stylesheet';
+      fbCss.href = 'https://unpkg.com/codemirror@5.65.16/lib/codemirror.css';
+      document.head.appendChild(fbCss);
+
+      const fbTheme = document.createElement('link');
+      fbTheme.rel = 'stylesheet';
+      fbTheme.href = 'https://unpkg.com/codemirror@5.65.16/theme/dracula.css';
+      document.head.appendChild(fbTheme);
+
+      const fbScript = document.createElement('script');
+      fbScript.src = 'https://unpkg.com/codemirror@5.65.16/lib/codemirror.js';
+      fbScript.onload = () => {
+        const fbMode = document.createElement('script');
+        fbMode.src = 'https://unpkg.com/codemirror@5.65.16/mode/clike/clike.js';
+        fbMode.onload = initCodeMirrorEditor;
+        document.head.appendChild(fbMode);
+      };
+      document.head.appendChild(fbScript);
     }
 
     function getCode() {
@@ -371,11 +402,7 @@ int main() {
       }, 600);
     }
 
-    if (editor) {
-      editor.on('change', onCodeChanged);
-    } else {
-      textareaEl.addEventListener('input', onCodeChanged);
-    }
+    textareaEl.addEventListener('input', onCodeChanged);
 
     function saveToHistory(code) {
       if (!code || code.trim() === '') return;
@@ -578,31 +605,4 @@ int main() {
       }
 
       const grp = scanGroups[currentGroupIdx];
-      const totalNeeded = computeExpectedTokensForGroup(grp);
-      const newTokens = raw.split(/\s+/);
-
-      for (let i = 0; i < newTokens.length; i++) {
-        const specIndex = (tokensCollectedInGroup + i) % grp.specifiers.length;
-        const spec = grp.specifiers[specIndex];
-        if (/%[diu]/i.test(spec) && !/^-?\d+$/.test(newTokens[i])) {
-          terminalOutput.innerHTML += `<span class="user-typed">${escapeHtml(raw)}</span>\n<span class="error-text">⚠ Type Error: '${escapeHtml(newTokens[i])}' integer (%d) nahi hai! Dobara enter karein: </span>`;
-          terminalOutput.scrollTop = terminalOutput.scrollHeight;
-          termInput.value = '';
-          termInput.focus();
-          return;
-        }
-      }
-
-      terminalOutput.innerHTML += `<span class="user-typed">${escapeHtml(raw)}</span>\n`;
-      terminalOutput.scrollTop = terminalOutput.scrollHeight;
-
-      if (grp.loops.length === 0) {
-        newTokens.forEach((tok, idx) => {
-          const vName = grp.varNames[tokensCollectedInGroup + idx];
-          if (vName && !isNaN(parseInt(tok, 10))) {
-            knownVars[vName] = parseInt(tok, 10);
-          }
-        });
-      }
-
-      collec
+  
