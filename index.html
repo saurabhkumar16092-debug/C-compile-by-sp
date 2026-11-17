@@ -605,4 +605,129 @@ int main() {
       }
 
       const grp = scanGroups[currentGroupIdx];
+      const totalNeeded = computeExpectedTokensForGroup(grp);
+      const newTokens = raw.split(/\s+/);
+
+      for (let i = 0; i < newTokens.length; i++) {
+        const specIndex = (tokensCollectedInGroup + i) % grp.specifiers.length;
+        const spec = grp.specifiers[specIndex];
+        if (/%[diu]/i.test(spec) && !/^-?\d+$/.test(newTokens[i])) {
+          terminalOutput.innerHTML += `<span class="user-typed">${escapeHtml(raw)}</span>\n<span class="error-text">⚠ Type Error: '${escapeHtml(newTokens[i])}' integer (%d) nahi hai! Dobara enter karein: </span>`;
+          terminalOutput.scrollTop = terminalOutput.scrollHeight;
+          termInput.value = '';
+          termInput.focus();
+          return;
+        }
+      }
+
+      terminalOutput.innerHTML += `<span class="user-typed">${escapeHtml(raw)}</span>\n`;
+      terminalOutput.scrollTop = terminalOutput.scrollHeight;
+
+      if (grp.loops.length === 0) {
+        newTokens.forEach((tok, idx) => {
+          const vName = grp.varNames[tokensCollectedInGroup + idx];
+          if (vName && !isNaN(parseInt(tok, 10))) {
+            knownVars[vName] = parseInt(tok, 10);
+          }
+        });
+      }
+
+      collectedTokens.push(...newTokens);
+      tokensCollectedInGroup += newTokens.length;
+
+      termInput.value = '';
+      termInput.disabled = true;
+      sendInputBtn.disabled = true;
+
+      if (tokensCollectedInGroup < totalNeeded) {
+        showCurrentGroupPrompt(false);
+      } else {
+        currentGroupIdx++;
+        tokensCollectedInGroup = 0;
+        if (currentGroupIdx < scanGroups.length) {
+          showCurrentGroupPrompt(true);
+        } else {
+          await compileAndRunFinal();
+        }
+      }
+    }
+
+    async function compileAndRunFinal(retryCount = 0) {
+      statusText.textContent = retryCount > 0 ? `Retrying (${retryCount})...` : 'Compiling...';
+      const code = getCode();
+      const stdinPayload = collectedTokens.length > 0 ? collectedTokens.join('\n') + '\n' : '';
+
+      try {
+        const response = await fetch('https://wandbox.org/api/compile.json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            compiler: 'gcc-head-c',
+            code: code,
+            stdin: stdinPayload,
+            save: false
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.program_error && data.program_error.includes('Resource temporarily unavailable') && retryCount < 3) {
+          await new Promise(res => setTimeout(res, 900));
+          return await compileAndRunFinal(retryCount + 1);
+        }
+
+        if (data.compiler_error) {
+          terminalOutput.innerHTML = '<span class="error-text">Compilation Error:\n' + escapeHtml(data.compiler_error) + '</span>';
+          finishExecution('Error');
+          return;
+        }
+
+        const fullOut = data.program_output || '';
+        const progErr = data.program_error || '';
+        const exitCode = data.status !== undefined ? data.status : '0';
+
+        let remainingOut = fullOut;
+        for (const grp of scanGroups) {
+          if (remainingOut.startsWith(grp.prompt)) {
+            remainingOut = remainingOut.substring(grp.prompt.length);
+          }
+        }
+
+        if (remainingOut) {
+          terminalOutput.innerHTML += escapeHtml(remainingOut);
+        }
+        if (progErr) {
+          terminalOutput.innerHTML += '\n<span class="error-text">' + escapeHtml(progErr) + '</span>';
+        }
+
+        terminalOutput.innerHTML += '\n\n<span class="system-text">--- Program Finished (Exit Code: ' + exitCode + ') ---</span>';
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        finishExecution('Finished');
+
+      } catch (err) {
+        if (retryCount < 2) {
+          await new Promise(res => setTimeout(res, 900));
+          return await compileAndRunFinal(retryCount + 1);
+        }
+        terminalOutput.innerHTML += '\n<span class="error-text">Network Error: Compiler server se connect nahi ho paya.</span>';
+        finishExecution('Failed');
+      }
+    }
+
+    function finishExecution(status) {
+      isRunning = false;
+      runBtn.disabled = false;
+      termInput.disabled = true;
+      sendInputBtn.disabled = true;
+      termInput.placeholder = 'Yahan input likhein aur Enter dabaein...';
+      statusText.textContent = status;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+  </script>
+
+</body>
+</html>
   
