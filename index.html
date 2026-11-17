@@ -7,7 +7,7 @@
   <meta name="google-site-verification" content="PnEzym5TDHD1qt3sfGdv5199iC9TrZ78o5uynPiIC-k" />
 
   <title>Campus C Lab by SP - Interactive Online C Compiler</title>
-  <meta name="description" content="Campus C Lab by SP is a free interactive online C compiler for B.Tech students with syntax highlighting and step-by-step live terminal input." />
+  <meta name="description" content="Campus C Lab by SP is a free interactive online C compiler for B.Tech students with syntax highlighting, auto-save, and step-by-step live terminal input." />
   <meta name="keywords" content="Campus C Lab, Campus C Lab by SP, C compile by sp, interactive C compiler, online C terminal, saurabhkumar16092-debug" />
   <meta name="author" content="SP (Saurabh Kumar)" />
 
@@ -30,38 +30,52 @@
     }
     header {
       background-color: #181825;
-      padding: 10px 14px;
+      padding: 8px 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #313244;
+      gap: 6px;
     }
     header h1 {
-      font-size: 17px;
+      font-size: 15px;
       color: #89b4fa;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+      white-space: nowrap;
     }
     .badge {
       background-color: #a6e3a1;
       color: #11111b;
-      font-size: 10px;
-      padding: 2px 7px;
+      font-size: 9px;
+      padding: 2px 6px;
       border-radius: 8px;
       font-weight: bold;
     }
     .btn-group {
       display: flex;
-      gap: 8px;
+      gap: 6px;
+      align-items: center;
+    }
+    select#exampleSelect {
+      background-color: #313244;
+      color: #cdd6f4;
+      border: 1px solid #45475a;
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 12px;
+      outline: none;
+      max-width: 110px;
     }
     button {
       border: none;
-      padding: 8px 14px;
+      padding: 7px 11px;
       border-radius: 6px;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
+      white-space: nowrap;
     }
     #runBtn {
       background-color: #a6e3a1;
@@ -86,13 +100,19 @@
     .section-label {
       background-color: #1e1e2e;
       color: #a6adc8;
-      font-size: 12px;
-      padding: 5px 12px;
+      font-size: 11px;
+      padding: 4px 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       border-bottom: 1px solid #282a36;
+    }
+    .save-indicator {
+      color: #a6e3a1;
+      font-size: 10px;
+      text-transform: none;
     }
     .CodeMirror {
       flex: 1;
@@ -167,7 +187,7 @@
     #sendInputBtn {
       background-color: #89b4fa;
       color: #11111b;
-      padding: 10px 16px;
+      padding: 10px 14px;
     }
   </style>
 </head>
@@ -176,6 +196,13 @@
   <header>
     <h1>⚡ Campus C Lab <span class="badge">LIVE GCC</span></h1>
     <div class="btn-group">
+      <select id="exampleSelect" onchange="loadExampleProgram()" title="Lab Programs">
+        <option value="">📂 Examples</option>
+        <option value="add">1. Add 2 Numbers</option>
+        <option value="matrix">2. Matrix Addition</option>
+        <option value="prime">3. Prime Number</option>
+        <option value="fact">4. Factorial</option>
+      </select>
       <button id="clearBtn" onclick="clearTerminal()">Clear</button>
       <button id="runBtn" onclick="startExecution()">▶ Run</button>
     </div>
@@ -183,39 +210,17 @@
 
   <div class="editor-container">
     <div class="section-label">
-      <span>main.c</span>
+      <span>main.c <span id="saveStatus" class="save-indicator">• Auto-saved</span></span>
       <span>By SP</span>
     </div>
     <textarea id="codeEditor">#include <stdio.h>
 
 int main() {
-    int r, c, i, j;
-    int A[10][10], B[10][10], sum[10][10];
-
-    printf("Rows aur columns enter karein: ");
-    scanf("%d %d", &r, &c);
-
-    printf("Pehli matrix ke elements enter karein:\n");
-    for (i = 0; i < r; i++)
-        for (j = 0; j < c; j++)
-            scanf("%d", &A[i][j]);
-
-    printf("Doosri matrix ke elements enter karein:\n");
-    for (i = 0; i < r; i++)
-        for (j = 0; j < c; j++)
-            scanf("%d", &B[i][j]);
-
-    for (i = 0; i < r; i++)
-        for (j = 0; j < c; j++)
-            sum[i][j] = A[i][j] + B[i][j];
-
-    printf("Matrices ka jod:\n");
-    for (i = 0; i < r; i++) {
-        for (j = 0; j < c; j++)
-            printf("%d\t", sum[i][j]);
-        printf("\n");
-    }
-
+    int a, b, sum;
+    printf("Enter first and second number: ");
+    scanf("%d %d", &a, &b);
+    sum = a + b;
+    printf("Sum of two numbers = %d\n", sum);
     return 0;
 }</textarea>
   </div>
@@ -225,7 +230,7 @@ int main() {
       <span>Terminal Output</span>
       <span id="statusText" style="color: #89b4fa;">Ready</span>
     </div>
-    <div id="terminalOutput">▶ 'Run' dabane ke baad yahan ek-ek karke output aayega aur neeche input box me aap value dal sakte hain...</div>
+    <div id="terminalOutput">▶ 'Run' dabane ke baad yahan output aayega aur neeche input box me aap value dal sakte hain...</div>
     <div class="input-bar">
       <span class="prompt-symbol">&gt;</span>
       <input type="text" id="termInput" placeholder="Yahan input likhein aur Enter dabaein..." disabled />
@@ -234,6 +239,13 @@ int main() {
   </div>
 
   <script>
+    const EXAMPLES = {
+      add: `#include <stdio.h>\n\nint main() {\n    int a, b, sum;\n    printf("Enter first and second number: ");\n    scanf("%d %d", &a, &b);\n    sum = a + b;\n    printf("Sum of two numbers = %d\\n", sum);\n    return 0;\n}`,
+      matrix: `#include <stdio.h>\n\nint main() {\n    int r, c, i, j;\n    int A[10][10], B[10][10], sum[10][10];\n\n    printf("Rows aur columns enter karein: ");\n    scanf("%d %d", &r, &c);\n\n    printf("Pehli matrix ke elements enter karein:\\n");\n    for (i = 0; i < r; i++)\n        for (j = 0; j < c; j++)\n            scanf("%d", &A[i][j]);\n\n    printf("Doosri matrix ke elements enter karein:\\n");\n    for (i = 0; i < r; i++)\n        for (j = 0; j < c; j++)\n            scanf("%d", &B[i][j]);\n\n    for (i = 0; i < r; i++)\n        for (j = 0; j < c; j++)\n            sum[i][j] = A[i][j] + B[i][j];\n\n    printf("Matrices ka jod:\\n");\n    for (i = 0; i < r; i++) {\n        for (j = 0; j < c; j++)\n            printf("%d\\t", sum[i][j]);\n        printf("\\n");\n    }\n    return 0;\n}`,
+      prime: `#include <stdio.h>\n\nint main() {\n    int n, i, flag = 0;\n    printf("Koi positive integer enter karein: ");\n    scanf("%d", &n);\n\n    if (n <= 1) flag = 1;\n    for (i = 2; i <= n / 2; ++i) {\n        if (n % i == 0) {\n            flag = 1;\n            break;\n        }\n    }\n    if (flag == 0)\n        printf("%d ek Prime number hai.\\n", n);\n    else\n        printf("%d Prime number nahi hai.\\n", n);\n    return 0;\n}`,
+      fact: `#include <stdio.h>\n\nint main() {\n    int n, i;\n    unsigned long long fact = 1;\n    printf("Factorial ke liye number enter karein: ");\n    scanf("%d", &n);\n\n    for (i = 1; i <= n; ++i) {\n        fact *= i;\n    }\n    printf("Factorial of %d = %llu\\n", n, fact);\n    return 0;\n}`
+    };
+
     const editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
       mode: 'text/x-csrc',
       theme: 'dracula',
@@ -242,6 +254,31 @@ int main() {
       tabSize: 4,
       lineWrapping: true
     });
+
+    // Load auto-saved code if present
+    const savedCode = localStorage.getItem('sp_campus_c_code');
+    if (savedCode && savedCode.trim() !== '') {
+      editor.setValue(savedCode);
+    }
+
+    const saveStatus = document.getElementById('saveStatus');
+    editor.on('change', () => {
+      localStorage.setItem('sp_campus_c_code', editor.getValue());
+      saveStatus.textContent = '• Saving...';
+      clearTimeout(window._saveTimer);
+      window._saveTimer = setTimeout(() => {
+        saveStatus.textContent = '• Auto-saved';
+      }, 600);
+    });
+
+    function loadExampleProgram() {
+      const sel = document.getElementById('exampleSelect');
+      if (sel.value && EXAMPLES[sel.value]) {
+        editor.setValue(EXAMPLES[sel.value]);
+        clearTerminal();
+      }
+      sel.value = '';
+    }
 
     const terminalOutput = document.getElementById('terminalOutput');
     const termInput = document.getElementById('termInput');
@@ -272,28 +309,20 @@ int main() {
       }
     });
 
-    // Smart analyzer: detects scanf format specifiers (%d %d), variable names, and enclosing loops!
     function analyzeCodeInputSteps(code) {
       const clean = code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
       const groups = [];
       let pendingPrompt = '';
-
-      // Track loop context before each scanf
       const lines = clean.split('\n');
-      let activeLoops = []; // stack of loop bounds
+      let activeLoops = [];
 
       for (let idx = 0; idx < lines.length; idx++) {
         const line = lines[idx].trim();
-
-        // Detect for-loop bound like: for (i = 0; i < r; i++) or for (int i = 0; i < 5; i++)
         const forMatch = line.match(/\bfor\s*\([^;]*;\s*[a-zA-Z_]\w*\s*(<=|<)\s*([a-zA-Z0-9_]+)\s*;/);
         if (forMatch) {
-          const op = forMatch[1];
-          const bound = forMatch[2];
-          activeLoops.push({ op, bound, lineIdx: idx });
+          activeLoops.push({ op: forMatch[1], bound: forMatch[2], lineIdx: idx });
         }
 
-        // Detect printf prompt
         const printfMatch = line.match(/\bprintf\s*\(\s*"((?:[^"\\]|\\.)*)"\s*\)\s*;/);
         if (printfMatch && !/%[sdfclux]/i.test(printfMatch[1])) {
           pendingPrompt += printfMatch[1]
@@ -302,15 +331,12 @@ int main() {
             .replace(/\\"/g, '"');
         }
 
-        // Detect scanf
         const scanfMatch = line.match(/\bscanf\s*\(\s*"([^"]*)"\s*,\s*([^)]+)\)/);
         if (scanfMatch) {
           const fmt = scanfMatch[1];
           const varsRaw = scanfMatch[2];
           const specifiers = fmt.match(/%[0-9.]*[diuoxXfFeEgGaAcsp]/g) || ['%d'];
           const varNames = varsRaw.split(',').map(v => v.replace(/&/g, '').trim());
-
-          // Check recent loops within 4 lines above this scanf
           const recentLoops = activeLoops.filter(l => idx - l.lineIdx <= 4);
 
           groups.push({
@@ -377,7 +403,7 @@ int main() {
       sendInputBtn.disabled = false;
       termInput.value = '';
       termInput.placeholder = totalNeeded > 1
-        ? `${remaining} value(s) bache hain (ek-ek karke ya space dekar likhein)...`
+        ? `${remaining} value(s) bache hain...`
         : `Value likhein aur Enter dabaein...`;
       termInput.focus();
     }
@@ -387,7 +413,7 @@ int main() {
       const raw = termInput.value.trim();
 
       if (raw === '') {
-        terminalOutput.innerHTML += `\n<span class="error-text">⚠ Error: Khali input nahi chalega! Kripya value enter karein: </span>`;
+        terminalOutput.innerHTML += `\n<span class="error-text">⚠ Khali input nahi chalega! Value enter karein: </span>`;
         terminalOutput.scrollTop = terminalOutput.scrollHeight;
         termInput.focus();
         return;
@@ -397,12 +423,11 @@ int main() {
       const totalNeeded = computeExpectedTokensForGroup(grp);
       const newTokens = raw.split(/\s+/);
 
-      // Validate numeric types if %d / %f expected
       for (let i = 0; i < newTokens.length; i++) {
         const specIndex = (tokensCollectedInGroup + i) % grp.specifiers.length;
         const spec = grp.specifiers[specIndex];
         if (/%[diu]/i.test(spec) && !/^-?\d+$/.test(newTokens[i])) {
-          terminalOutput.innerHTML += `<span class="user-typed">${escapeHtml(raw)}</span>\n<span class="error-text">⚠ Type Error: '${escapeHtml(newTokens[i])}' ek integer (%d) nahi hai! Dobara sahi number enter karein: </span>`;
+          terminalOutput.innerHTML += `<span class="user-typed">${escapeHtml(raw)}</span>\n<span class="error-text">⚠ Type Error: '${escapeHtml(newTokens[i])}' integer (%d) nahi hai! Dobara enter karein: </span>`;
           terminalOutput.scrollTop = terminalOutput.scrollHeight;
           termInput.value = '';
           termInput.focus();
@@ -410,11 +435,9 @@ int main() {
         }
       }
 
-      // Show user typed input
       terminalOutput.innerHTML += `<span class="user-typed">${escapeHtml(raw)}</span>\n`;
       terminalOutput.scrollTop = terminalOutput.scrollHeight;
 
-      // Save variable values (like r = 2, c = 2) so loop bounds know exact count!
       if (grp.loops.length === 0) {
         newTokens.forEach((tok, idx) => {
           const vName = grp.varNames[tokensCollectedInGroup + idx];
@@ -432,10 +455,8 @@ int main() {
       sendInputBtn.disabled = true;
 
       if (tokensCollectedInGroup < totalNeeded) {
-        // Still waiting for remaining elements of this matrix/loop!
         showCurrentGroupPrompt(false);
       } else {
-        // Move to next scanf / next matrix
         currentGroupIdx++;
         tokensCollectedInGroup = 0;
         if (currentGroupIdx < scanGroups.length) {
@@ -446,8 +467,8 @@ int main() {
       }
     }
 
-    async function compileAndRunFinal() {
-      statusText.textContent = 'Compiling & Running...';
+    async function compileAndRunFinal(retryCount = 0) {
+      statusText.textContent = retryCount > 0 ? `Retrying (${retryCount})...` : 'Compiling...';
       const code = editor.getValue();
       const stdinPayload = collectedTokens.length > 0 ? collectedTokens.join('\n') + '\n' : '';
 
@@ -464,6 +485,12 @@ int main() {
         });
 
         const data = await response.json();
+
+        // Auto-retry if Wandbox container temporarily busy (crun: Resource temporarily unavailable)
+        if (data.program_error && data.program_error.includes('Resource temporarily unavailable') && retryCount < 3) {
+          await new Promise(res => setTimeout(res, 900));
+          return await compileAndRunFinal(retryCount + 1);
+        }
 
         if (data.compiler_error) {
           terminalOutput.innerHTML = '<span class="error-text">Compilation Error:\n' + escapeHtml(data.compiler_error) + '</span>';
@@ -494,6 +521,10 @@ int main() {
         finishExecution('Finished');
 
       } catch (err) {
+        if (retryCount < 2) {
+          await new Promise(res => setTimeout(res, 900));
+          return await compileAndRunFinal(retryCount + 1);
+        }
         terminalOutput.innerHTML += '\n<span class="error-text">Network Error: Compiler server se connect nahi ho paya.</span>';
         finishExecution('Failed');
       }
