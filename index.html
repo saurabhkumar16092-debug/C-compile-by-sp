@@ -76,7 +76,6 @@
       color: #cdd6f4;
     }
 
-    /* Top Colorful Editor Section */
     .editor-container {
       flex: 1.1;
       display: flex;
@@ -103,7 +102,6 @@
       line-height: 1.5;
     }
 
-    /* Bottom Interactive Terminal Section */
     .terminal-container {
       flex: 0.9;
       display: flex;
@@ -134,7 +132,6 @@
       font-style: italic;
     }
 
-    /* Live Input Bar */
     .input-bar {
       display: flex;
       background-color: #181825;
@@ -251,9 +248,7 @@ int main() {
       }
     });
 
-    // Extract printf prompts before each scanf so user sees exact prompt immediately!
     function extractInteractiveSteps(code) {
-      // Remove comments
       const clean = code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
       const steps = [];
       const stmtRegex = /\b(printf|scanf)\s*\(([^;]*)\)\s*;/g;
@@ -334,31 +329,32 @@ int main() {
       const stdinPayload = collectedInputs.length > 0 ? collectedInputs.join('\n') + '\n' : '';
 
       try {
-        const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+        // Free, reliable GCC API (Wandbox) - no API key required
+        const response = await fetch('https://wandbox.org/api/compile.json', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            language: 'c',
-            version: '10.2.0',
-            files: [{ name: 'main.c', content: code }],
+            compiler: 'gcc-head-c',
+            code: code,
             stdin: stdinPayload,
-            run_timeout: 4000
+            save: false
           })
         });
 
         const data = await response.json();
 
-        if (data.compile && data.compile.code !== 0) {
-          terminalOutput.innerHTML = '<span class="error-text">Compilation Error:\n' + escapeHtml(data.compile.stderr || data.compile.output) + '</span>';
+        // Check compilation error
+        if (data.compiler_error) {
+          terminalOutput.innerHTML = '<span class="error-text">Compilation Error:\n' + escapeHtml(data.compiler_error) + '</span>';
           finishExecution('Error');
           return;
         }
 
-        const fullOut = data.run ? (data.run.stdout || '') : '';
-        const runErr = data.run ? (data.run.stderr || '') : '';
-        const exitCode = data.run ? data.run.code : 0;
+        const fullOut = data.program_output || '';
+        const progErr = data.program_error || '';
+        const exitCode = data.status !== undefined ? data.status : '0';
 
-        // Remove already-printed prompt prefixes from final stdout so only remaining output prints cleanly
+        // Strip already-shown prompt texts from the beginning of program_output
         let remainingOut = fullOut;
         for (const p of promptsQueue) {
           if (remainingOut.startsWith(p)) {
@@ -369,8 +365,8 @@ int main() {
         if (remainingOut) {
           terminalOutput.innerHTML += escapeHtml(remainingOut);
         }
-        if (runErr) {
-          terminalOutput.innerHTML += '\n<span class="error-text">' + escapeHtml(runErr) + '</span>';
+        if (progErr) {
+          terminalOutput.innerHTML += '\n<span class="error-text">' + escapeHtml(progErr) + '</span>';
         }
 
         terminalOutput.innerHTML += '\n\n<span class="system-text">--- Program Finished (Exit Code: ' + exitCode + ') ---</span>';
@@ -378,7 +374,7 @@ int main() {
         finishExecution('Finished');
 
       } catch (err) {
-        terminalOutput.innerHTML += '\n<span class="error-text">Network Error: Server se connect nahi ho paya.</span>';
+        terminalOutput.innerHTML += '\n<span class="error-text">Network Error: Compiler server se connect nahi ho paya.</span>';
         finishExecution('Failed');
       }
     }
