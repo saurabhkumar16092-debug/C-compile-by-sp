@@ -32,8 +32,6 @@ textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 1
 .err{color:#f38ba8}
 .sys{color:#f9e2af;font-style:italic}
 .hint{color:#94e2d5;font-size:14px}
-
-/* Inline Terminal Input right next to prompt text */
 .inline-inp{
   background:transparent;
   border:none;
@@ -49,7 +47,6 @@ textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 1
   padding:0 2px;
   vertical-align:baseline;
 }
-
 #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99;justify-content:center;align-items:center;padding:15px}
 .m-box{background:#1e1e2e;border:1px solid #45475a;border-radius:10px;width:100%;max-width:440px;max-height:75vh;display:flex;flex-direction:column;overflow:hidden}
 .m-head{background:#181825;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
@@ -66,8 +63,9 @@ textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 1
       <option value="">📂 Examples</option>
       <option value="add">1. Add 2 Numbers</option>
       <option value="matrix">2. Matrix Sum</option>
-      <option value="prime">3. Prime Check</option>
-      <option value="fact">4. Factorial</option>
+      <option value="matmul">3. Matrix Multiply</option>
+      <option value="prime">4. Prime Check</option>
+      <option value="fact">5. Factorial</option>
     </select>
     <button id="clearBtn" type="button" onclick="clrTerm()">Clear</button>
     <button id="runBtn" type="button" onclick="runCode()">▶ Run</button>
@@ -107,6 +105,7 @@ int main() {
 const EX={
   add:`#include <stdio.h>\n\nint main() {\n    int a, b, sum;\n    printf("Enter first and second number: ");\n    scanf("%d %d", &a, &b);\n    sum = a + b;\n    printf("Sum of two numbers = %d\\n", sum);\n    return 0;\n}`,
   matrix:`#include <stdio.h>\n\nint main() {\n    int r, c, i, j, A[10][10], B[10][10], sum[10][10];\n    printf("Rows aur columns enter karein: ");\n    scanf("%d %d", &r, &c);\n    printf("Pehli matrix ke elements:\\n");\n    for(i=0;i<r;i++) for(j=0;j<c;j++) scanf("%d",&A[i][j]);\n    printf("Doosri matrix ke elements:\\n");\n    for(i=0;i<r;i++) for(j=0;j<c;j++) scanf("%d",&B[i][j]);\n    for(i=0;i<r;i++) for(j=0;j<c;j++) sum[i][j]=A[i][j]+B[i][j];\n    printf("Matrices ka jod:\\n");\n    for(i=0;i<r;i++){for(j=0;j<c;j++)printf("%d\\t",sum[i][j]);printf("\\n");}\n    return 0;\n}`,
+  matmul:`#include <stdio.h>\n#define MAX 10\n\nint main() {\n    int a[MAX][MAX], b[MAX][MAX], c[MAX][MAX];\n    int r1, c1, r2, c2;\n\n    printf("Pehle matrix ki rows aur columns darj karein: ");\n    scanf("%d %d", &r1, &c1);\n\n    printf("Doosre matrix ki rows aur columns darj karein: ");\n    scanf("%d %d", &r2, &c2);\n\n    if (c1 != r2) {\n        printf("Guna sambhav nahi hai: pehle matrix ke columns, doosre ke rows ke barabar hone chahiye.\\n");\n        return 1;\n    }\n\n    printf("Pehle matrix ke elements darj karein:\\n");\n    for (int i = 0; i < r1; i++)\n        for (int j = 0; j < c1; j++)\n            scanf("%d", &a[i][j]);\n\n    printf("Doosre matrix ke elements darj karein:\\n");\n    for (int i = 0; i < r2; i++)\n        for (int j = 0; j < c2; j++)\n            scanf("%d", &b[i][j]);\n\n    for (int i = 0; i < r1; i++) {\n        for (int j = 0; j < c2; j++) {\n            c[i][j] = 0;\n            for (int k = 0; k < c1; k++)\n                c[i][j] += a[i][k] * b[k][j];\n        }\n    }\n\n    printf("Parinam matrix:\\n");\n    for (int i = 0; i < r1; i++) {\n        for (int j = 0; j < c2; j++)\n            printf("%d\\t", c[i][j]);\n        printf("\\n");\n    }\n    return 0;\n}`,
   prime:`#include <stdio.h>\n\nint main() {\n    int n, i, flag=0;\n    printf("Number enter karein: ");\n    scanf("%d", &n);\n    if(n<=1) flag=1;\n    for(i=2;i<=n/2;i++) if(n%i==0){flag=1;break;}\n    printf(flag==0?"%d Prime hai\\n":"%d Prime nahi hai\\n", n);\n    return 0;\n}`,
   fact:`#include <stdio.h>\n\nint main() {\n    int n, i; unsigned long long f=1;\n    printf("Number enter karein: ");\n    scanf("%d", &n);\n    for(i=1;i<=n;i++) f*=i;\n    printf("Factorial = %llu\\n", f);\n    return 0;\n}`
 };
@@ -187,13 +186,16 @@ function clrTerm(){
 
 function parseCode(code){
   const cl=code.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/.*$/gm,''),lines=cl.split('\n'),res=[];
-  let p='',loops=[];
+  let p='',loops=[],inIf=false;
   lines.forEach((l,i)=>{
-    const fm=l.match(/\bfor\s*\([^;]*;\s*[a-zA-Z_]\w*\s*(<=|<)\s*([a-zA-Z0-9_]+)\s*;/);
+    const t=l.trim();
+    if(/^if\s*\(/.test(t)){inIf=true;return;}
+    if(inIf){if(t.includes('}'))inIf=false;return;}
+    const fm=t.match(/\bfor\s*\([^;]*;\s*[a-zA-Z_]\w*\s*(<=|<)\s*([a-zA-Z0-9_]+)\s*;/);
     if(fm)loops.push({op:fm[1],b:fm[2],i});
-    const pm=l.match(/\bprintf\s*\(\s*"((?:[^"\\]|\\.)*)"\s*\)\s*;/);
+    const pm=t.match(/\bprintf\s*\(\s*"((?:[^"\\]|\\.)*)"\s*\)\s*;/);
     if(pm&&!/%[sdfclux]/i.test(pm[1]))p+=pm[1].replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\"/g,'"');
-    const sm=l.match(/\bscanf\s*\(\s*"([^"]*)"\s*,\s*([^)]+)\)/);
+    const sm=t.match(/\bscanf\s*\(\s*"([^"]*)"\s*,\s*([^)]+)\)/);
     if(sm){
       const sp=sm[1].match(/%[0-9.]*[diuoxXfFeEgGaAcsp]/g)||['%d'];
       const vn=sm[2].split(',').map(v=>v.replace(/&/g,'').trim());
@@ -227,7 +229,6 @@ function showP(first){
   }
   out.appendChild(promptSpan);
 
-  // Create inline input right next to the prompt text
   const inp=document.createElement('input');
   inp.type='text';
   inp.className='inline-inp';
@@ -268,7 +269,6 @@ async function sendIn(inp){
       errSpan.textContent=`\n⚠ '${nt[i]}' number nahi hai! Dobara likhein: `;
       inp.replaceWith(document.createTextNode(raw));
       out.appendChild(errSpan);
-      // Re-create clean inline input
       const retryInp=document.createElement('input');
       retryInp.type='text';
       retryInp.className='inline-inp';
@@ -281,7 +281,6 @@ async function sendIn(inp){
     }
   }
 
-  // Replace live input box with static cyan text + newline
   const valSpan=document.createElement('span');
   valSpan.className='u-in';
   valSpan.textContent=raw+'\n';
