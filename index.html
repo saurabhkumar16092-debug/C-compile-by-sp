@@ -299,27 +299,59 @@ async function sendIn(inp){
   }
 }
 
-async function execAPI(retry=0){
-  st.textContent=retry?`Retrying (${retry})...`:'Compiling...';
+async function execAPI(){
+  st.textContent='Compiling...';
+  const code=getC();
+  const stdinStr=toks.length?toks.join('\n')+'\n':'';
+
+  // 1. Primary Fast Server: Piston GCC API
   try{
-    const r=await fetch('https://wandbox.org/api/compile.json',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({compiler:'gcc-head-c',code:getC(),stdin:toks.length?toks.join('\n')+'\n':'',save:false})
+    const r1=await fetch('https://emkc.org/api/v2/piston/execute',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        language:'c',
+        version:'10.2.0',
+        files:[{name:'main.c',content:code}],
+        stdin:stdinStr
+      })
     });
-    const d=await r.json();
-    if(d.program_error&&d.program_error.includes('Resource temporarily unavailable')&&retry<3){
-      await new Promise(x=>setTimeout(x,900));return await execAPI(retry+1);
+    if(r1.ok){
+      const d1=await r1.json();
+      if(d1.compile && d1.compile.code!==0){
+        out.innerHTML=`<span class="err">Compilation Error:\n${esc(d1.compile.stderr||d1.compile.output)}</span>`;
+        done('Error');return;
+      }
+      if(d1.run){
+        let rem=d1.run.stdout||'';
+        grps.forEach(g=>{if(rem.startsWith(g.p))rem=rem.slice(g.p.length);});
+        if(rem)out.innerHTML+=esc(rem);
+        if(d1.run.stderr)out.innerHTML+=`\n<span class="err">${esc(d1.run.stderr)}</span>`;
+        out.innerHTML+=`\n\n<span class="sys">--- Finished (Exit Code: ${d1.run.code??0}) ---</span>`;
+        out.scrollTop=out.scrollHeight;done('Finished');return;
+      }
     }
-    if(d.compiler_error){out.innerHTML=`<span class="err">Compilation Error:\n${esc(d.compiler_error)}</span>`;done('Error');return;}
-    let rem=d.program_output||'';
+  }catch(e1){}
+
+  // 2. Backup Server: Wandbox GCC API
+  st.textContent='Switching Server...';
+  try{
+    const r2=await fetch('https://wandbox.org/api/compile.json',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({compiler:'gcc-head-c',code:code,stdin:stdinStr,save:false})
+    });
+    const d2=await r2.json();
+    if(d2.compiler_error){out.innerHTML=`<span class="err">Compilation Error:\n${esc(d2.compiler_error)}</span>`;done('Error');return;}
+    let rem=d2.program_output||'';
     grps.forEach(g=>{if(rem.startsWith(g.p))rem=rem.slice(g.p.length);});
     if(rem)out.innerHTML+=esc(rem);
-    if(d.program_error)out.innerHTML+=`\n<span class="err">${esc(d.program_error)}</span>`;
-    out.innerHTML+=`\n\n<span class="sys">--- Finished (Exit Code: ${d.status??0}) ---</span>`;
+    if(d2.program_error)out.innerHTML+=`\n<span class="err">${esc(d2.program_error)}</span>`;
+    out.innerHTML+=`\n\n<span class="sys">--- Finished (Exit Code: ${d2.status??0}) ---</span>`;
     out.scrollTop=out.scrollHeight;done('Finished');
-  }catch(e){
-    if(retry<2){await new Promise(x=>setTimeout(x,900));return await execAPI(retry+1);}
-    out.innerHTML+=`\n<span class="err">Network Error: Server se connect nahi ho paya.</span>`;done('Failed');
+  }catch(e2){
+    out.innerHTML+=`\n<span class="err">Network Error: Dono servers se connect nahi ho paya. Internet check karein.</span>`;
+    done('Failed');
   }
 }
 
