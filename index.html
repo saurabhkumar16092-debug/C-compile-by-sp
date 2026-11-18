@@ -6,11 +6,12 @@
 <meta name="google-site-verification" content="PnEzym5TDHD1qt3sfGdv5199iC9TrZ78o5uynPiIC-k">
 <title>Campus C Lab by SP - Online C Compiler</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/dracula.min.css">
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/clike/clike.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation}
-html,body{width:100%;height:100vh;height:100dvh;overflow:hidden;background:#11111b;color:#cdd6f4;font-family:sans-serif;-webkit-text-size-adjust:100%}
+html,body{width:100%;height:100vh;height:100dvh;overflow:hidden;background:#11111b;color:#cdd6f4;font-family:sans-serif}
 body{display:flex;flex-direction:column}
 header{background:#181825;padding:10px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #313244;gap:6px;flex-wrap:nowrap}
 header h1{font-size:15px;color:#89b4fa;white-space:nowrap}
@@ -20,42 +21,25 @@ select{background:#313244;color:#cdd6f4;max-width:98px}
 #runBtn{background:#a6e3a1;color:#11111b;padding:8px 14px;font-size:14px}
 #runBtn:disabled{background:#585b70;color:#cdd6f4}
 #clearBtn,#histBtn,#fontBtn{background:#313244;color:#cdd6f4}
-
-/* Clean White Editor Theme */
-.ed-box{flex:1;display:flex;flex-direction:column;border-bottom:2px solid #cbd5e1;min-height:0;background:#ffffff}
-.lbl-ed{background:#f1f5f9;color:#334155;font-size:12px;font-weight:bold;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #cbd5e1}
+.ed-box{flex:1;display:flex;flex-direction:column;border-bottom:2px solid #45475a;min-height:0;background:#282a36}
 .lbl{background:#1e1e2e;color:#a6adc8;font-size:12px;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #282a36}
-.editor-wrap{flex:1;display:flex;position:relative;overflow:hidden;min-height:0;background:#ffffff}
-#lineNums{background:#f8fafc;color:#64748b;padding:12px 6px;font-family:monospace;font-size:16px;line-height:1.5;text-align:right;user-select:none;overflow:hidden;min-width:34px;border-right:1px solid #e2e8f0}
-textarea#code{flex:1;background:#ffffff;color:#0f172a;border:none;padding:12px 10px;font-family:monospace;font-size:16px !important;line-height:1.5;resize:none;outline:none;white-space:pre;overflow:auto}
-
-/* Prevent Mobile Auto-Zoom on CodeMirror hidden textarea & inputs */
-.CodeMirror{flex:1;height:100%!important;background:#ffffff !important;color:#0f172a !important;font-family:monospace;font-size:16px !important;line-height:1.5}
-.CodeMirror textarea{font-size:16px !important}
-.CodeMirror-gutters{background:#f8fafc !important;border-right:1px solid #e2e8f0 !important}
-.CodeMirror-linenumber{color:#64748b !important}
-.CodeMirror-cursor{border-left:2px solid #0f172a !important}
-.cm-s-default .cm-keyword{color:#7c3aed !important;font-weight:bold}
-.cm-s-default .cm-def{color:#0369a1 !important;font-weight:bold}
-.cm-s-default .cm-variable{color:#0f172a !important}
-.cm-s-default .cm-string{color:#15803d !important}
-.cm-s-default .cm-number{color:#b45309 !important}
-.cm-s-default .cm-comment{color:#64748b !important;font-style:italic}
-.cm-s-default .cm-meta{color:#be123c !important;font-weight:bold}
-
+.editor-wrap{flex:1;display:flex;position:relative;overflow:hidden;min-height:0}
+#lineNums{background:#21222c;color:#6272a4;padding:12px 6px;font-family:monospace;font-size:17px;line-height:1.5;text-align:right;user-select:none;overflow:hidden;min-width:34px;border-right:1px solid #343746}
+textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 10px;font-family:monospace;font-size:17px;line-height:1.5;resize:none;outline:none;white-space:pre;overflow:auto}
+.CodeMirror{flex:1;height:100%!important;font-family:monospace;font-size:17px;line-height:1.5}
 .term-box{flex:1;display:flex;flex-direction:column;background:#0b0b12;min-height:0}
-#out{flex:1;padding:12px;font-family:monospace;font-size:16px;line-height:1.5;color:#a6e3a1;overflow-y:auto;white-space:pre-wrap;word-break:break-word;cursor:text}
+#out{flex:1;padding:12px;font-family:monospace;font-size:17px;line-height:1.5;color:#a6e3a1;overflow-y:auto;white-space:pre-wrap;word-break:break-word;cursor:text}
 .u-in{color:#89dceb;font-weight:bold}
 .err{color:#f38ba8}
 .sys{color:#f9e2af;font-style:italic}
-.hint{color:#94e2d5;font-size:14px}
+.hint{color:#94e2d5;font-size:15px}
 .inline-inp{
   background:transparent;
   border:none;
   border-bottom:1px dashed #89b4fa;
   color:#89dceb;
   font-family:monospace;
-  font-size:16px !important;
+  font-size:17px;
   font-weight:bold;
   outline:none;
   width:140px;
@@ -91,7 +75,7 @@ textarea#code{flex:1;background:#ffffff;color:#0f172a;border:none;padding:12px 1
 </header>
 
 <div class="ed-box">
-  <div class="lbl-ed"><span>main.c <span id="svTxt" style="color:#15803d">• Saved</span></span><span>By SP</span></div>
+  <div class="lbl"><span>main.c <span id="svTxt" style="color:#a6e3a1">• Saved</span></span><span>By SP</span></div>
   <div class="editor-wrap" id="edWrap">
     <div id="lineNums">1</div>
     <textarea id="code" spellcheck="false">#include <stdio.h>
@@ -120,12 +104,6 @@ int main() {
 </div>
 
 <script>
-// Strict pinch-zoom and double-tap zoom lock on mobile
-document.addEventListener('gesturestart', e => e.preventDefault());
-document.addEventListener('touchmove', e => {
-  if (e.touches.length > 1) e.preventDefault();
-}, { passive: false });
-
 const EX={
   add:`#include <stdio.h>\n\nint main() {\n    int a, b, sum;\n    printf("Enter first and second number: ");\n    scanf("%d %d", &a, &b);\n    sum = a + b;\n    printf("Sum of two numbers = %d\\n", sum);\n    return 0;\n}`,
   matrix:`#include <stdio.h>\n\nint main() {\n    int r, c, i, j, A[10][10], B[10][10], sum[10][10];\n    printf("Rows aur columns enter karein: ");\n    scanf("%d %d", &r, &c);\n    printf("Pehli matrix ke elements:\\n");\n    for(i=0;i<r;i++) for(j=0;j<c;j++) scanf("%d",&A[i][j]);\n    printf("Doosri matrix ke elements:\\n");\n    for(i=0;i<r;i++) for(j=0;j<c;j++) scanf("%d",&B[i][j]);\n    for(i=0;i<r;i++) for(j=0;j<c;j++) sum[i][j]=A[i][j]+B[i][j];\n    printf("Matrices ka jod:\\n");\n    for(i=0;i<r;i++){for(j=0;j<c;j++)printf("%d\\t",sum[i][j]);printf("\\n");}\n    return 0;\n}`,
@@ -136,17 +114,17 @@ const EX={
 
 const ta=document.getElementById('code'), ln=document.getElementById('lineNums');
 let cm=null;
-let curFont=16;
+let curFont=17;
 
 function toggleFont(){
-  curFont = curFont===16 ? 19 : 16;
-  document.getElementById('fontBtn').textContent = curFont===19 ? 'A-' : 'A+';
-  ta.style.setProperty('font-size', curFont+'px', 'important');
+  curFont = curFont===17 ? 20 : (curFont===20 ? 16 : 17);
+  document.getElementById('fontBtn').textContent = curFont===20 ? 'A-' : 'A+';
+  ta.style.fontSize = curFont+'px';
   ln.style.fontSize = curFont+'px';
   document.getElementById('out').style.fontSize = curFont+'px';
   const cmEl=document.querySelector('.CodeMirror');
   if(cmEl){
-    cmEl.style.setProperty('font-size', curFont+'px', 'important');
+    cmEl.style.fontSize = curFont+'px';
     if(cm) cm.refresh();
   }
 }
@@ -161,11 +139,9 @@ function tryCM(){
   if(typeof CodeMirror!=='undefined' && !cm){
     const v=ta.value;
     ln.style.display='none';
-    cm=CodeMirror.fromTextArea(ta,{mode:'text/x-csrc',theme:'default',lineNumbers:true,indentUnit:4,tabSize:4,lineWrapping:true});
+    cm=CodeMirror.fromTextArea(ta,{mode:'text/x-csrc',theme:'dracula',lineNumbers:true,indentUnit:4,tabSize:4,lineWrapping:true});
     cm.setValue(v);
     cm.on('change',onChg);
-    const hiddenTa=cm.getInputField();
-    if(hiddenTa) hiddenTa.style.setProperty('font-size', '16px', 'important');
   }
 }
 tryCM();
@@ -275,7 +251,7 @@ function showP(first){
   const inp=document.createElement('input');
   inp.type='text';
   inp.className='inline-inp';
-  inp.style.setProperty('font-size', curFont+'px', 'important');
+  inp.style.fontSize=curFont+'px';
   inp.autocomplete='off';
   inp.autocorrect='off';
   inp.spellcheck=false;
@@ -316,7 +292,7 @@ async function sendIn(inp){
       const retryInp=document.createElement('input');
       retryInp.type='text';
       retryInp.className='inline-inp';
-      retryInp.style.setProperty('font-size', curFont+'px', 'important');
+      retryInp.style.fontSize=curFont+'px';
       retryInp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendIn(retryInp);}});
       out.appendChild(retryInp);
       activeInp=retryInp;
@@ -451,4 +427,3 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 </script>
 </body>
 </html>
-
