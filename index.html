@@ -23,7 +23,7 @@ select{background:#313244;color:#cdd6f4;max-width:95px}
 .ed-box{flex:1.1;display:flex;flex-direction:column;border-bottom:2px solid #45475a;min-height:0;background:#282a36}
 .lbl{background:#1e1e2e;color:#a6adc8;font-size:11px;padding:4px 10px;display:flex;justify-content:space-between;border-bottom:1px solid #282a36}
 .editor-wrap{flex:1;display:flex;position:relative;overflow:hidden;min-height:0}
-#lineNums{background:#21222c;color:#6272a4;padding:12px 6px;font-family:monospace;font-size:16px;line-height:1.5;text-align:right;user-select:none;overflow:hidden;min-width:32px;border-right:1px solid #343746}
+#lineNums{background:#21222c;color:#627244;padding:12px 6px;font-family:monospace;font-size:16px;line-height:1.5;text-align:right;user-select:none;overflow:hidden;min-width:32px;border-right:1px solid #343746}
 textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 10px;font-family:monospace;font-size:16px;line-height:1.5;resize:none;outline:none;white-space:pre;overflow:auto}
 .CodeMirror{flex:1;height:100%!important;font-family:monospace;font-size:16px;line-height:1.5}
 .term-box{flex:0.9;display:flex;flex-direction:column;background:#0b0b12;min-height:0}
@@ -189,7 +189,10 @@ function parseCode(code){
   let p='',loops=[],inIf=false;
   lines.forEach((l,i)=>{
     const t=l.trim();
-    if(/^if\s*\(/.test(t)){inIf=true;return;}
+    if(/^if\s*\(/.test(t)){
+      if(t.includes('{')) inIf=true;
+      return;
+    }
     if(inIf){if(t.includes('}'))inIf=false;return;}
     const fm=t.match(/\bfor\s*\([^;]*;\s*[a-zA-Z_]\w*\s*(<=|<)\s*([a-zA-Z0-9_]+)\s*;/);
     if(fm)loops.push({op:fm[1],b:fm[2],i});
@@ -299,7 +302,15 @@ async function sendIn(inp){
   }
 }
 
-async function fetchWithTimeout(url, opts, ms=7000){
+function toBase64(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function fromBase64(str){
+  if(!str) return '';
+  try{return decodeURIComponent(escape(atob(str)));}catch(e){return atob(str);}
+}
+
+async function fetchWithTimeout(url, opts, ms=7500){
   const ctrl=new AbortController();
   const id=setTimeout(()=>ctrl.abort(),ms);
   try{
@@ -312,154 +323,89 @@ async function fetchWithTimeout(url, opts, ms=7000){
   }
 }
 
-async function execAPI(){
-  st.textContent='Compiling...';
-  const code=getC();
-  const stdinStr=toks.length?toks.join('\n')+'\n':'';
-  const payload=JSON.stringify({compiler:'gcc-head-c',code:code,stdin:stdinStr,save:false});
-
-  const endpoints=[
-    'https://wandbox.org/api/compile.json',
-    'https://corsproxy.io/?' + encodeURIComponent('https://wandbox.org/api/compile.json')
-  ];
-
-  for(let idx=0;idx<endpoints.length;idx++){
-    try{
-      if(idx>0) st.textContent='Retrying via Proxy...';
-      const r=await fetchWithTimeout(endpoints[idx],{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:payload
-      },8000);
-      if(!r.ok) continue;
-      const d=await r.json();
-      if(d.program_error && d.program_error.includes('Resource temporarily unavailable')){
-        await new Promise(x=>setTimeout(x,800));
-        continue;
-      }
-      if(d.compiler_error){
-        out.innerHTML=`<span class="err">Compilation Error:\n${esc(d.compiler_error)}</span>`;
-        done('Error');return;
-      }
-      let rem=d.program_output||'';
-      grps.forEach(g=>{if(rem.startsWith(g.p))rem=rem.slice(g.p.length);});
-      if(rem)out.innerHTML+=esc(rem);
-      if(d.program_error)out.innerHTML+=`\n<span class="err">${esc(d.program_error)}</span>`;
-      out.innerHTML+=`\n\n<span class="sys">--- Finished (Exit Code: ${d.status??0}) ---</span>`;
-      out.scrollTop=out.scrollHeight;done('Finished');return;
-    }catch(e){}
+// Engine 1: Real Linux GCC via Judge0 CE Cloud (Supports ALL C programs: pointers, structs, recursion, math.h, strings, etc.)
+async function runJudge0(code, stdinStr){
+  const r=await fetchWithTimeout('https://ce.judge0.com/submissions/?base64_encoded=true&wait=true',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      source_code:toBase64(code),
+      language_id:50, // C (GCC 9.2.0)
+      stdin:toBase64(stdinStr)
+    })
+  },8500);
+  if(!r.ok) throw new Error('Judge0 HTTP '+r.status);
+  const d=await r.json();
+  if(d.compile_output){
+    return {compileErr:fromBase64(d.compile_output)};
   }
-
-  // Fallback: Built-in Local C Interpreter for standard C programs if network blocks external APIs
-  try{
-    const simOut=runLocalCSimulator(code, toks);
-    if(simOut!==null){
-      out.innerHTML+=esc(simOut);
-      out.innerHTML+=`\n\n<span class="sys">--- Finished (Local Fast Engine • Exit Code: 0) ---</span>`;
-      out.scrollTop=out.scrollHeight;done('Finished');return;
-    }
-  }catch(simErr){}
-
-  out.innerHTML+=`\n<span class="err">Network Error: Server se connect nahi ho paya.</span>`;
-  done('Failed');
+  return {
+    stdout:fromBase64(d.stdout),
+    stderr:fromBase64(d.stderr) || (d.message?fromBase64(d.message):''),
+    exitCode:d.exit_code ?? (d.status && d.status.id===3 ? 0 : 1)
+  };
 }
 
-// Built-in lightweight C evaluator for basic arithmetic, loops & matrix programs when cloud API is unreachable
-function runLocalCSimulator(code, inputTokens){
-  const clean=code.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/.*$/gm,'');
-  if(/#include\s*<string\.h>|#include\s*<math\.h>|malloc|struct|pointer|\*/.test(clean.replace(/a\[i\]\[k\]\s*\*\s*b\[k\]\[j\]/g,''))) return null;
-
-  let ptr=0;
-  const nextInt=()=>ptr<inputTokens.length?parseInt(inputTokens[ptr++],10):0;
-  const scope={};
-  const arrays={};
-  let output='';
-
-  const evalExpr=(expr)=>{
-    let e=expr.trim();
-    e=e.replace(/([a-zA-Z_]\w*)\[([^\]]+)\]\[([^\]]+)\]/g,(_,arr,i,j)=>{
-      const iv=evalExpr(i), jv=evalExpr(j);
-      return (arrays[arr]&&arrays[arr][iv]&&arrays[arr][iv][jv]!==undefined)?arrays[arr][iv][jv]:0;
-    });
-    e=e.replace(/([a-zA-Z_]\w*)\[([^\]]+)\]/g,(_,arr,i)=>{
-      const iv=evalExpr(i);
-      return (arrays[arr]&&arrays[arr][iv]!==undefined)?arrays[arr][iv]:0;
-    });
-    e=e.replace(/\b([a-zA-Z_]\w*)\b/g,(m)=>scope[m]!==undefined?scope[m]:m);
-    try{return Function('"use strict";return ('+e+')')();}catch(_){return 0;}
+// Engine 2: Real Linux GCC via Wandbox Cloud
+async function runWandbox(code, stdinStr){
+  const r=await fetchWithTimeout('https://wandbox.org/api/compile.json',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({compiler:'gcc-head-c',code:code,stdin:stdinStr,save:false})
+  },7000);
+  if(!r.ok) throw new Error('Wandbox HTTP '+r.status);
+  const d=await r.json();
+  if(d.program_error && d.program_error.includes('Resource temporarily unavailable')){
+    throw new Error('Busy');
+  }
+  if(d.compiler_error){
+    return {compileErr:d.compiler_error};
+  }
+  return {
+    stdout:d.program_output||'',
+    stderr:d.program_error||'',
+    exitCode:d.status??0
   };
+}
 
-  // Detect matrix multiplication pattern
-  if(clean.includes('c[i][j] += a[i][k] * b[k][j]')){
-    const r1=nextInt(), c1=nextInt(), r2=nextInt(), c2=nextInt();
-    if(c1!==r2) return 'Guna sambhav nahi hai: pehle matrix ke columns, doosre ke rows ke barabar hone chahiye.\n';
-    const A=Array.from({length:r1},()=>Array.from({length:c1},()=>nextInt()));
-    const B=Array.from({length:r2},()=>Array.from({length:c2},()=>nextInt()));
-    let res='Parinam matrix:\n';
-    for(let i=0;i<r1;i++){
-      for(let j=0;j<c2;j++){
-        let s=0;
-        for(let k=0;k<c1;k++) s+=A[i][k]*B[k][j];
-        res+=s+'\t';
-      }
-      res+='\n';
-    }
-    return res;
+async function execAPI(){
+  st.textContent='Compiling (GCC)...';
+  const code=getC();
+  const stdinStr=toks.length?toks.join('\n')+'\n':'';
+
+  let result=null;
+
+  // Race both real GCC cloud engines simultaneously so whichever responds first (<2-4s) delivers the output!
+  try{
+    result=await Promise.any([
+      runJudge0(code, stdinStr),
+      runWandbox(code, stdinStr)
+    ]);
+  }catch(allErr){
+    // One quick retry on Judge0 if both had transient hiccup
+    try{
+      st.textContent='Retrying GCC...';
+      result=await runJudge0(code, stdinStr);
+    }catch(retryErr){}
   }
 
-  // Detect matrix addition pattern
-  if(clean.includes('sum[i][j] = A[i][j] + B[i][j]')||clean.includes('sum[i][j]=A[i][j]+B[i][j]')){
-    const r=nextInt(), c=nextInt();
-    const A=Array.from({length:r},()=>Array.from({length:c},()=>nextInt()));
-    const B=Array.from({length:r},()=>Array.from({length:c},()=>nextInt()));
-    let res='Matrices ka jod:\n';
-    for(let i=0;i<r;i++){
-      for(let j=0;j<c;j++) res+=(A[i][j]+B[i][j])+'\t';
-      res+='\n';
+  if(result){
+    if(result.compileErr){
+      out.innerHTML=`<span class="err">Compilation Error:\n${esc(result.compileErr)}</span>`;
+      done('Error');return;
     }
-    return res;
+    let rem=result.stdout||'';
+    grps.forEach(g=>{if(rem.startsWith(g.p))rem=rem.slice(g.p.length);});
+    if(rem)out.innerHTML+=esc(rem);
+    if(result.stderr)out.innerHTML+=`\n<span class="err">${esc(result.stderr)}</span>`;
+    out.innerHTML+=`\n\n<span class="sys">--- Finished (Exit Code: ${result.exitCode}) ---</span>`;
+    out.scrollTop=out.scrollHeight;
+    done('Finished');
+    return;
   }
 
-  // General simple sequential C statements (e.g. a+b, factorial, prime, etc.)
-  const lines=clean.split('\n');
-  let skipFirstPrompt=true;
-  for(let line of lines){
-    line=line.trim();
-    if(!line||line.startsWith('#')||line.startsWith('int main')||line==='{'||line==='}'||line.startsWith('return')) continue;
-    const decl=line.match(/^(?:int|float|double|long|unsigned\s+long\s+long)\s+(.+);$/);
-    if(decl){
-      decl[1].split(',').forEach(part=>{
-        const [k,v]=part.split('=').map(s=>s.trim());
-        if(!k.includes('[')) scope[k]=v!==undefined?evalExpr(v):0;
-      });
-      continue;
-    }
-    const sc=line.match(/^scanf\s*\(\s*"[^"]*"\s*,\s*([^)]+)\)\s*;$/);
-    if(sc){
-      sc[1].split(',').forEach(v=>{
-        const vn=v.replace(/&/g,'').trim();
-        scope[vn]=nextInt();
-      });
-      continue;
-    }
-    const asg=line.match(/^([a-zA-Z_]\w*)\s*=\s*(.+);$/);
-    if(asg){
-      scope[asg[1]]=evalExpr(asg[2]);
-      continue;
-    }
-    const pr=line.match(/^printf\s*\(\s*"((?:[^"\\]|\\.)*)"(?:\s*,\s*([^)]+))?\)\s*;$/);
-    if(pr){
-      let fmt=pr[1].replace(/\\n/g,'\n').replace(/\\t/g,'\t');
-      if(!pr[2]&&skipFirstPrompt){skipFirstPrompt=false;continue;}
-      if(pr[2]){
-        const args=pr[2].split(',').map(a=>evalExpr(a));
-        let ai=0;
-        fmt=fmt.replace(/%[0-9.]*[diufFl]/g,()=>args[ai++]!==undefined?args[ai-1]:0);
-      }
-      output+=fmt;
-    }
-  }
-  return output||null;
+  out.innerHTML+=`\n<span class="err">Network Error: Compiler server se connect nahi ho paya. Apna internet connection check karein aur dubara Run dabayein.</span>`;
+  done('Failed');
 }
 
 function done(s){running=false;rBtn.disabled=false;activeInp=null;st.textContent=s;}
