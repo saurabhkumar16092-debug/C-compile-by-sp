@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 <meta name="google-site-verification" content="PnEzym5TDHD1qt3sfGdv5199iC9TrZ78o5uynPiIC-k">
 <title>Campus C Lab by SP - Online C Compiler</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
@@ -10,35 +10,36 @@
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/clike/clike.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#11111b;color:#cdd6f4;font-family:sans-serif;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
-header{background:#181825;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #313244;gap:4px}
-header h1{font-size:14px;color:#89b4fa;white-space:nowrap}
-.btns{display:flex;gap:5px;align-items:center}
-select,button{border:none;padding:6px 9px;border-radius:6px;font-weight:bold;font-size:12px;cursor:pointer}
-select{background:#313244;color:#cdd6f4;max-width:95px}
-#runBtn{background:#a6e3a1;color:#11111b}
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation}
+html,body{width:100%;height:100vh;height:100dvh;overflow:hidden;background:#11111b;color:#cdd6f4;font-family:sans-serif}
+body{display:flex;flex-direction:column}
+header{background:#181825;padding:10px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #313244;gap:6px;flex-wrap:nowrap}
+header h1{font-size:15px;color:#89b4fa;white-space:nowrap}
+.btns{display:flex;gap:6px;align-items:center}
+select,button{border:none;padding:8px 11px;border-radius:7px;font-weight:bold;font-size:13px;cursor:pointer}
+select{background:#313244;color:#cdd6f4;max-width:98px}
+#runBtn{background:#a6e3a1;color:#11111b;padding:8px 14px;font-size:14px}
 #runBtn:disabled{background:#585b70;color:#cdd6f4}
-#clearBtn,#histBtn{background:#313244;color:#cdd6f4}
-.ed-box{flex:1.1;display:flex;flex-direction:column;border-bottom:2px solid #45475a;min-height:0;background:#282a36}
-.lbl{background:#1e1e2e;color:#a6adc8;font-size:11px;padding:4px 10px;display:flex;justify-content:space-between;border-bottom:1px solid #282a36}
+#clearBtn,#histBtn,#fontBtn{background:#313244;color:#cdd6f4}
+.ed-box{flex:1;display:flex;flex-direction:column;border-bottom:2px solid #45475a;min-height:0;background:#282a36}
+.lbl{background:#1e1e2e;color:#a6adc8;font-size:12px;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #282a36}
 .editor-wrap{flex:1;display:flex;position:relative;overflow:hidden;min-height:0}
-#lineNums{background:#21222c;color:#627244;padding:12px 6px;font-family:monospace;font-size:16px;line-height:1.5;text-align:right;user-select:none;overflow:hidden;min-width:32px;border-right:1px solid #343746}
-textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 10px;font-family:monospace;font-size:16px;line-height:1.5;resize:none;outline:none;white-space:pre;overflow:auto}
-.CodeMirror{flex:1;height:100%!important;font-family:monospace;font-size:16px;line-height:1.5}
-.term-box{flex:0.9;display:flex;flex-direction:column;background:#0b0b12;min-height:0}
-#out{flex:1;padding:12px;font-family:monospace;font-size:16px;line-height:1.5;color:#a6e3a1;overflow-y:auto;white-space:pre-wrap;word-break:break-word;cursor:text}
+#lineNums{background:#21222c;color:#6272a4;padding:12px 6px;font-family:monospace;font-size:17px;line-height:1.5;text-align:right;user-select:none;overflow:hidden;min-width:34px;border-right:1px solid #343746}
+textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 10px;font-family:monospace;font-size:17px;line-height:1.5;resize:none;outline:none;white-space:pre;overflow:auto}
+.CodeMirror{flex:1;height:100%!important;font-family:monospace;font-size:17px;line-height:1.5}
+.term-box{flex:1;display:flex;flex-direction:column;background:#0b0b12;min-height:0}
+#out{flex:1;padding:12px;font-family:monospace;font-size:17px;line-height:1.5;color:#a6e3a1;overflow-y:auto;white-space:pre-wrap;word-break:break-word;cursor:text}
 .u-in{color:#89dceb;font-weight:bold}
 .err{color:#f38ba8}
 .sys{color:#f9e2af;font-style:italic}
-.hint{color:#94e2d5;font-size:14px}
+.hint{color:#94e2d5;font-size:15px}
 .inline-inp{
   background:transparent;
   border:none;
   border-bottom:1px dashed #89b4fa;
   color:#89dceb;
   font-family:monospace;
-  font-size:16px;
+  font-size:17px;
   font-weight:bold;
   outline:none;
   width:140px;
@@ -56,9 +57,10 @@ textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 1
 </head>
 <body>
 <header>
-  <h1>⚡ Campus C Lab</h1>
+  <h1>⚡ C Lab</h1>
   <div class="btns">
-    <button id="histBtn" type="button" onclick="openHist()">🕒 History</button>
+    <button id="fontBtn" type="button" onclick="toggleFont()" title="Font Size">A+</button>
+    <button id="histBtn" type="button" onclick="openHist()">🕒</button>
     <select id="exSel" onchange="loadEx()">
       <option value="">📂 Examples</option>
       <option value="add">1. Add 2 Numbers</option>
@@ -112,6 +114,20 @@ const EX={
 
 const ta=document.getElementById('code'), ln=document.getElementById('lineNums');
 let cm=null;
+let curFont=17;
+
+function toggleFont(){
+  curFont = curFont===17 ? 20 : (curFont===20 ? 16 : 17);
+  document.getElementById('fontBtn').textContent = curFont===20 ? 'A-' : 'A+';
+  ta.style.fontSize = curFont+'px';
+  ln.style.fontSize = curFont+'px';
+  document.getElementById('out').style.fontSize = curFont+'px';
+  const cmEl=document.querySelector('.CodeMirror');
+  if(cmEl){
+    cmEl.style.fontSize = curFont+'px';
+    if(cm) cm.refresh();
+  }
+}
 
 function updLines(){
   const n=ta.value.split('\n').length;
@@ -235,11 +251,12 @@ function showP(first){
   const inp=document.createElement('input');
   inp.type='text';
   inp.className='inline-inp';
+  inp.style.fontSize=curFont+'px';
   inp.autocomplete='off';
   inp.autocorrect='off';
   inp.spellcheck=false;
   inp.addEventListener('input',()=>{
-    inp.style.width=Math.max(80,(inp.value.length+2)*10)+'px';
+    inp.style.width=Math.max(80,(inp.value.length+2)*11)+'px';
   });
   inp.addEventListener('keydown',e=>{
     if(e.key==='Enter'){
@@ -275,6 +292,7 @@ async function sendIn(inp){
       const retryInp=document.createElement('input');
       retryInp.type='text';
       retryInp.className='inline-inp';
+      retryInp.style.fontSize=curFont+'px';
       retryInp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendIn(retryInp);}});
       out.appendChild(retryInp);
       activeInp=retryInp;
@@ -323,14 +341,13 @@ async function fetchWithTimeout(url, opts, ms=7500){
   }
 }
 
-// Engine 1: Real Linux GCC via Judge0 CE Cloud (Supports ALL C programs: pointers, structs, recursion, math.h, strings, etc.)
 async function runJudge0(code, stdinStr){
   const r=await fetchWithTimeout('https://ce.judge0.com/submissions/?base64_encoded=true&wait=true',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       source_code:toBase64(code),
-      language_id:50, // C (GCC 9.2.0)
+      language_id:50,
       stdin:toBase64(stdinStr)
     })
   },8500);
@@ -346,7 +363,6 @@ async function runJudge0(code, stdinStr){
   };
 }
 
-// Engine 2: Real Linux GCC via Wandbox Cloud
 async function runWandbox(code, stdinStr){
   const r=await fetchWithTimeout('https://wandbox.org/api/compile.json',{
     method:'POST',
@@ -375,14 +391,12 @@ async function execAPI(){
 
   let result=null;
 
-  // Race both real GCC cloud engines simultaneously so whichever responds first (<2-4s) delivers the output!
   try{
     result=await Promise.any([
       runJudge0(code, stdinStr),
       runWandbox(code, stdinStr)
     ]);
   }catch(allErr){
-    // One quick retry on Judge0 if both had transient hiccup
     try{
       st.textContent='Retrying GCC...';
       result=await runJudge0(code, stdinStr);
