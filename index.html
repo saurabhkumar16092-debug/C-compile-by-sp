@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Campus C Lab by SP</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
 
 <style>
 * {
@@ -16,83 +20,76 @@
 }
 
 body {
-    font-family: system-ui, Arial, sans-serif;
     background: #0b1120;
     color: #e5e7eb;
-    min-height: 100vh;
+    font-family: system-ui, Arial, sans-serif;
 }
 
 header {
-    padding: 15px;
     background: #111827;
-    border-bottom: 1px solid #273449;
+    border-bottom: 1px solid #334155;
+    padding: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
     flex-wrap: wrap;
+    gap: 10px;
 }
 
 .logo {
-    font-size: 20px;
+    font-size: 21px;
     font-weight: bold;
     color: #38bdf8;
 }
 
 .logo small {
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     color: #94a3b8;
     font-weight: normal;
 }
 
-.header-buttons {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
 button, select {
-    padding: 9px 12px;
-    border: 1px solid #334155;
-    border-radius: 8px;
     background: #1e293b;
     color: white;
-    cursor: pointer;
-    font-size: 13px;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 11px 13px;
+    font-size: 14px;
 }
 
-button:hover {
-    background: #334155;
+button {
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(.97);
 }
 
 .run-btn {
     background: #16a34a;
     border: none;
+    color: white;
     font-weight: bold;
 }
 
-.run-btn:hover {
-    background: #15803d;
-}
-
 main {
+    width: 100%;
     max-width: 1100px;
     margin: auto;
-    padding: 15px;
+    padding: 12px;
 }
 
 .toolbar {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 8px;
     margin-bottom: 12px;
-    align-items: center;
 }
 
 .toolbar select {
-    flex: 1;
-    min-width: 160px;
+    grid-column: 1 / -1;
+    width: 100%;
 }
 
 .editor-box {
@@ -102,84 +99,122 @@ main {
 }
 
 .editor-title {
-    padding: 10px 12px;
     background: #111827;
+    padding: 12px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    gap: 5px;
     font-size: 13px;
 }
 
-.CodeMirror {
-    height: 390px;
-    font-size: 14px;
-    font-family: Consolas, monospace;
-}
+/* EDITOR BIG SIZE */
 
-.CodeMirror-gutters {
-    border-right: 1px solid #334155;
+.CodeMirror {
+    height: 60vh !important;
+    min-height: 420px;
+    font-size: 18px !important;
+    line-height: 1.65 !important;
+    font-family: Consolas, monospace !important;
 }
 
 .CodeMirror-scroll {
-    min-height: 390px;
+    min-height: 420px;
 }
+
+.CodeMirror-gutters {
+    background: #111827 !important;
+}
+
+.CodeMirror-linenumber {
+    font-size: 15px;
+}
+
+/* FALLBACK TEXTAREA */
+
+#code {
+    display: block;
+    width: 100%;
+    height: 60vh;
+    min-height: 420px;
+    padding: 15px;
+    background: #0b1120;
+    color: white;
+    font-size: 18px;
+    line-height: 1.6;
+    font-family: monospace;
+    border: none;
+    outline: none;
+}
+
+/* INPUT AND OUTPUT STACKED */
 
 .bottom-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: 14px;
     margin-top: 15px;
 }
 
 .panel {
+    background: #111827;
     border: 1px solid #334155;
     border-radius: 10px;
     overflow: hidden;
-    background: #111827;
 }
 
 .panel-title {
-    padding: 11px;
     background: #1e293b;
+    padding: 13px;
+    font-size: 16px;
     font-weight: bold;
-    font-size: 14px;
 }
 
 .panel-body {
     padding: 12px;
 }
 
+/* INPUT */
+
 #stdin {
     width: 100%;
-    min-height: 100px;
+    min-height: 150px;
     resize: vertical;
-    background: #0b1120;
-    color: #e5e7eb;
+    padding: 15px;
+    background: #020617;
+    color: white;
     border: 1px solid #334155;
     border-radius: 8px;
-    padding: 10px;
+    font-size: 17px;
+    line-height: 1.6;
     font-family: monospace;
-    font-size: 14px;
 }
+
+/* OUTPUT */
 
 #output {
-    min-height: 100px;
-    max-height: 300px;
+    width: 100%;
+    min-height: 220px;
+    max-height: 500px;
     overflow: auto;
     white-space: pre-wrap;
-    word-wrap: break-word;
+    overflow-wrap: anywhere;
     background: #020617;
     color: #4ade80;
-    padding: 12px;
+    padding: 16px;
     border-radius: 8px;
     font-family: monospace;
-    font-size: 14px;
+    font-size: 18px;
+    line-height: 1.7;
 }
 
+/* STATUS */
+
 .status {
-    padding: 10px;
+    margin-top: 12px;
+    padding: 12px;
+    font-size: 13px;
     color: #94a3b8;
-    font-size: 12px;
+    overflow-wrap: anywhere;
 }
 
 footer {
@@ -188,6 +223,8 @@ footer {
     color: #64748b;
     font-size: 12px;
 }
+
+/* LIGHT THEME */
 
 .light {
     background: #f1f5f9;
@@ -205,18 +242,11 @@ footer {
     background: white;
 }
 
-.light .CodeMirror {
-    border-color: #cbd5e1;
-}
-
-.light #stdin {
-    background: white;
+.light #stdin,
+.light #output,
+.light #code {
+    background: #ffffff;
     color: #111827;
-}
-
-.light #output {
-    background: #f8fafc;
-    color: #166534;
 }
 
 .light button,
@@ -231,26 +261,73 @@ footer {
     color: white;
 }
 
-@media(max-width: 650px) {
+.light .CodeMirror {
+    background: white !important;
+    color: #111827 !important;
+}
+
+.light .CodeMirror-gutters {
+    background: #e2e8f0 !important;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
     header {
-        align-items: flex-start;
+        padding: 12px;
     }
 
-    .bottom-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .CodeMirror {
-        height: 340px;
-        font-size: 13px;
+    .logo {
+        font-size: 19px;
     }
 
     main {
-        padding: 10px;
+        padding: 9px;
     }
 
-    button {
-        padding: 8px 10px;
+    .toolbar {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .toolbar select {
+        grid-column: 1 / -1;
+    }
+
+    button, select {
+        font-size: 14px;
+        padding: 12px 8px;
+    }
+
+    .CodeMirror {
+        height: 65vh !important;
+        min-height: 400px;
+        font-size: 18px !important;
+    }
+
+    .CodeMirror-scroll {
+        min-height: 400px;
+    }
+
+    #code {
+        height: 65vh;
+        min-height: 400px;
+        font-size: 18px;
+    }
+
+    #stdin {
+        min-height: 160px;
+        font-size: 17px;
+    }
+
+    #output {
+        min-height: 240px;
+        font-size: 18px;
+    }
+
+    .panel-title {
+        font-size: 16px;
     }
 }
 </style>
@@ -259,15 +336,17 @@ footer {
 <body>
 
 <header>
+
     <div class="logo">
         Campus C Lab
         <small>by SP | Online C Programming Lab</small>
     </div>
 
-    <div class="header-buttons">
+    <div>
         <button onclick="toggleTheme()">🌙 Theme</button>
         <button onclick="showHistory()">📚 History</button>
     </div>
+
 </header>
 
 <main>
@@ -275,7 +354,7 @@ footer {
     <div class="toolbar">
 
         <select id="examples" onchange="loadExample()">
-            <option value="">📖 Select C Example</option>
+            <option value="">📚 Select C Example</option>
             <option value="hello">Hello World</option>
             <option value="addition">Addition</option>
             <option value="subtraction">Subtraction</option>
@@ -291,9 +370,13 @@ footer {
         </select>
 
         <button onclick="copyCode()">📋 Copy</button>
+
         <button onclick="downloadCode()">⬇ Download</button>
+
         <button onclick="clearCode()">🗑 Clear</button>
+
         <button class="run-btn" onclick="runCode()">▶ RUN</button>
+
     </div>
 
     <div class="editor-box">
@@ -307,6 +390,8 @@ footer {
 
     </div>
 
+    <!-- INPUT -->
+
     <div class="bottom-grid">
 
         <div class="panel">
@@ -316,15 +401,21 @@ footer {
             </div>
 
             <div class="panel-body">
-                <textarea id="stdin" placeholder="Enter input values here.
+
+                <textarea id="stdin"
+placeholder="Yahan program ke input likhen...
+
 Example:
 10
 20
 
-For scanf, values can be separated by spaces or new lines."></textarea>
+Agar scanf hai to input yahan den."></textarea>
+
             </div>
 
         </div>
+
+        <!-- OUTPUT -->
 
         <div class="panel">
 
@@ -333,7 +424,9 @@ For scanf, values can be separated by spaces or new lines."></textarea>
             </div>
 
             <div class="panel-body">
+
                 <div id="output">Your program output will appear here...</div>
+
             </div>
 
         </div>
@@ -341,23 +434,28 @@ For scanf, values can be separated by spaces or new lines."></textarea>
     </div>
 
     <div class="status" id="status">
-        Ready | C Language | Compiler connected through API when Run is pressed
+        Ready | C Language | Online Compiler
     </div>
 
 </main>
 
 <footer>
-    Campus C Lab by SP · Learn C Programming
+    Campus C Lab by SP | Learn C Programming
 </footer>
 
+<!-- CODEMIRROR -->
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
 
 <script>
 
-/* ===============================
-   1. STARTING CODE
-================================ */
+/* STARTING CODE */
 
 const starterCode = `#include <stdio.h>
 
@@ -369,15 +467,13 @@ int main() {
 
     sum = a + b;
 
-    printf("Sum = %d\\\\n", sum);
+    printf("Sum = %d\\n", sum);
 
     return 0;
 }`;
 
 
-/* ===============================
-   2. CODE EXAMPLES
-================================ */
+/* EXAMPLES */
 
 const examples = {
 
@@ -399,7 +495,7 @@ int main() {
 
     sum = a + b;
 
-    printf("Sum = %d\\\\n", sum);
+    printf("Sum = %d\\n", sum);
 
     return 0;
 }`,
@@ -412,7 +508,7 @@ int main() {
     printf("Enter two numbers: ");
     scanf("%d %d", &a, &b);
 
-    printf("Difference = %d\\\\n", a - b);
+    printf("Difference = %d\\n", a - b);
 
     return 0;
 }`,
@@ -425,7 +521,7 @@ int main() {
     printf("Enter two numbers: ");
     scanf("%d %d", &a, &b);
 
-    printf("Product = %d\\\\n", a * b);
+    printf("Product = %d\\n", a * b);
 
     return 0;
 }`,
@@ -469,7 +565,7 @@ loop: `#include <stdio.h>
 int main() {
 
     for (int i = 1; i <= 10; i++) {
-        printf("%d\\\\n", i);
+        printf("%d\\n", i);
     }
 
     return 0;
@@ -484,7 +580,7 @@ int main() {
     scanf("%d", &n);
 
     for (int i = 1; i <= 10; i++) {
-        printf("%d x %d = %d\\\\n", n, i, n * i);
+        printf("%d x %d = %d\\n", n, i, n * i);
     }
 
     return 0;
@@ -547,7 +643,7 @@ int main() {
         scanf("%d", &arr[i]);
     }
 
-    printf("Array Elements:\\\\n");
+    printf("Array Elements:\\n");
 
     for (i = 0; i < 5; i++) {
         printf("%d ", arr[i]);
@@ -575,131 +671,174 @@ int main() {
 };
 
 
-/* ===============================
-   3. CODE EDITOR
-================================ */
+/* EDITOR INITIALIZATION */
 
-const editor = CodeMirror.fromTextArea(
-    document.getElementById("code"),
-    {
-        mode: "text/x-csrc",
-        theme: "dracula",
-        lineNumbers: true,
-        indentUnit: 4,
-        tabSize: 4,
-        lineWrapping: false,
-        autoCloseBrackets: true,
-        matchBrackets: true
+let editor = null;
+
+const codeBox = document.getElementById("code");
+
+try {
+
+    if (typeof CodeMirror !== "undefined") {
+
+        editor = CodeMirror.fromTextArea(codeBox, {
+
+            mode: "text/x-csrc",
+
+            theme: "dracula",
+
+            lineNumbers: true,
+
+            indentUnit: 4,
+
+            tabSize: 4,
+
+            lineWrapping: false,
+
+            autoCloseBrackets: true,
+
+            matchBrackets: true,
+
+            extraKeys: {
+                "Ctrl-Enter": runCode,
+                "Cmd-Enter": runCode,
+                "Tab": function(cm) {
+                    cm.replaceSelection("    ", "end");
+                }
+            }
+
+        });
+
     }
-);
+
+} catch(error) {
+
+    console.log("Editor loading error:", error);
+
+}
 
 
-/* ===============================
-   4. AUTO SAVE
-================================ */
+/* GET AND SET CODE */
 
-const savedCode = localStorage.getItem("campus_c_code");
+function getCode() {
 
-editor.setValue(savedCode || starterCode);
+    if (editor) {
+        return editor.getValue();
+    }
 
-editor.on("change", function() {
+    return codeBox.value;
+}
 
-    localStorage.setItem(
-        "campus_c_code",
-        editor.getValue()
-    );
+
+function setCode(code) {
+
+    if (editor) {
+        editor.setValue(code);
+    } else {
+        codeBox.value = code;
+    }
+}
+
+
+/* AUTO SAVE */
+
+const oldCode = localStorage.getItem("campus_c_code");
+
+setCode(oldCode || starterCode);
+
+
+function saveCurrentCode() {
+
+    localStorage.setItem("campus_c_code", getCode());
 
     document.getElementById("saveStatus").textContent =
         "✓ Auto Saved";
+}
 
-});
+
+if (editor) {
+
+    editor.on("change", saveCurrentCode);
+
+} else {
+
+    codeBox.addEventListener("input", saveCurrentCode);
+
+}
 
 
-/* ===============================
-   5. LOAD EXAMPLE
-================================ */
+/* LOAD EXAMPLE */
 
 function loadExample() {
 
-    const selected = document.getElementById("examples").value;
+    const value = document.getElementById("examples").value;
 
-    if (!selected) return;
+    if (!value) return;
 
-    editor.setValue(examples[selected]);
+    setCode(examples[value]);
 
     document.getElementById("stdin").value = "";
 
     document.getElementById("output").textContent =
-        "Example loaded. Click RUN to execute.";
+        "Example loaded. Press RUN.";
 
     document.getElementById("status").textContent =
-        "Example loaded: " + selected;
+        "Example loaded: " + value;
 }
 
 
-/* ===============================
-   6. COPY CODE
-================================ */
+/* COPY */
 
 async function copyCode() {
 
     try {
 
-        await navigator.clipboard.writeText(
-            editor.getValue()
-        );
+        await navigator.clipboard.writeText(getCode());
 
         document.getElementById("status").textContent =
             "Code copied successfully!";
 
-    } catch (error) {
-
-        editor.focus();
-        editor.execCommand("selectAll");
+    } catch(error) {
 
         document.getElementById("status").textContent =
-            "Select code and copy manually.";
+            "Copy unavailable. Select code and copy manually.";
 
     }
 }
 
 
-/* ===============================
-   7. DOWNLOAD CODE
-================================ */
+/* DOWNLOAD */
 
 function downloadCode() {
 
-    const code = editor.getValue();
-
     const blob = new Blob(
-        [code],
+        [getCode()],
         { type: "text/plain" }
     );
 
+    const url = URL.createObjectURL(blob);
+
     const link = document.createElement("a");
 
-    link.href = URL.createObjectURL(blob);
+    link.href = url;
     link.download = "main.c";
 
     link.click();
 
-    URL.revokeObjectURL(link.href);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 
     document.getElementById("status").textContent =
-        "C file downloaded.";
+        "File downloaded: main.c";
 }
 
 
-/* ===============================
-   8. CLEAR EDITOR
-================================ */
+/* CLEAR */
 
 function clearCode() {
 
-    if (confirm("Clear the complete code?")) {
+    if (confirm("Kya aap pura code clear karna chahte hain?")) {
 
-        editor.setValue("");
+        setCode("");
 
         document.getElementById("stdin").value = "";
 
@@ -712,9 +851,7 @@ function clearCode() {
 }
 
 
-/* ===============================
-   9. HISTORY
-================================ */
+/* HISTORY */
 
 function saveHistory(code) {
 
@@ -738,90 +875,94 @@ function saveHistory(code) {
 
 function showHistory() {
 
-    let history = JSON.parse(
+    const history = JSON.parse(
         localStorage.getItem("campus_c_history") || "[]"
     );
 
     if (history.length === 0) {
-        alert("No code history saved yet.");
+        alert("No code history available.");
         return;
     }
 
-    let message = "CODE HISTORY\\n\\n";
+    let text = "CODE HISTORY\\n\\n";
 
-    history.forEach((item, index) => {
-        message += (index + 1) + ". " + item.date + "\\n";
+    history.forEach((item, i) => {
+        text += (i + 1) + ". " + item.date + "\\n";
     });
 
-    let choice = prompt(
-        message + "\\nEnter history number to restore:"
+    const choice = prompt(
+        text + "\\nEnter number to restore:"
     );
 
     if (choice === null) return;
 
-    let index = Number(choice) - 1;
+    const index = Number(choice) - 1;
 
     if (index >= 0 && index < history.length) {
 
-        editor.setValue(history[index].code);
+        setCode(history[index].code);
 
         document.getElementById("status").textContent =
-            "History restored.";
+            "History restored successfully.";
     }
 }
 
 
-/* ===============================
-   10. THEME
-================================ */
+/* THEME */
 
 function toggleTheme() {
 
     document.body.classList.toggle("light");
 
-    const isLight = document.body.classList.contains("light");
+    const light = document.body.classList.contains("light");
 
-    editor.setOption(
-        "theme",
-        isLight ? "default" : "dracula"
-    );
+    if (editor) {
+        editor.setOption(
+            "theme",
+            light ? "default" : "dracula"
+        );
+    }
 
     localStorage.setItem(
         "campus_c_theme",
-        isLight ? "light" : "dark"
+        light ? "light" : "dark"
     );
 }
 
 
 if (localStorage.getItem("campus_c_theme") === "light") {
+
     document.body.classList.add("light");
-    editor.setOption("theme", "default");
+
+    if (editor) {
+        editor.setOption("theme", "default");
+    }
+
 }
 
 
-/* ===============================
-   11. RUN C PROGRAM
-================================ */
+/* RUN PROGRAM */
 
 async function runCode() {
 
-    const code = editor.getValue();
+    const code = getCode();
 
     const input = document.getElementById("stdin").value;
 
-    const outputBox = document.getElementById("output");
+    const output = document.getElementById("output");
 
-    const statusBox = document.getElementById("status");
+    const status = document.getElementById("status");
 
     if (!code.trim()) {
 
-        outputBox.textContent = "Please write some C code first.";
+        output.textContent = "Please write C code first.";
 
         return;
     }
 
-    outputBox.textContent = "⏳ Compiling and running...";
-    statusBox.textContent = "Connecting to C Compiler...";
+    output.textContent = "⏳ Compiling your program...";
+
+    status.textContent = "Connecting to compiler...";
 
     saveHistory(code);
 
@@ -837,7 +978,9 @@ async function runCode() {
                 },
 
                 body: JSON.stringify({
+
                     language: "c",
+
                     version: "*",
 
                     files: [
@@ -852,104 +995,112 @@ async function runCode() {
                     args: [],
 
                     compile_timeout: 10000,
+
                     run_timeout: 3000,
+
                     compile_memory_limit: -1,
+
                     run_memory_limit: -1
+
                 })
+            }
         );
 
         if (!response.ok) {
-            throw new Error(
-                "Compiler API error: " + response.status
-            );
+
+            throw new Error("Compiler server error: " + response.status);
+
         }
 
         const result = await response.json();
 
-        let text = "";
-
-        /* Compiler output */
+        let resultText = "";
 
         if (result.compile) {
 
             if (result.compile.stderr) {
-                text += "COMPILER MESSAGE:\\n";
-                text += result.compile.stderr + "\\n";
+
+                resultText += "COMPILER MESSAGE:\\n";
+
+                resultText += result.compile.stderr + "\\n";
+
             }
 
             if (result.compile.output) {
-                text += result.compile.output + "\\n";
+
+                resultText += result.compile.output + "\\n";
+
             }
 
             if (result.compile.code !== 0) {
 
-                outputBox.textContent =
-                    text || "Compilation failed.";
+                output.textContent =
+                    resultText || "Compilation failed.";
 
-                statusBox.textContent =
+                status.textContent =
                     "❌ Compilation Error";
 
                 return;
-            }
-        }
 
-        /* Program output */
+            }
+
+        }
 
         if (result.run) {
 
             if (result.run.stdout) {
-                text += "\\nOUTPUT:\\n";
-                text += result.run.stdout;
+
+                resultText += "\\nOUTPUT:\\n";
+
+                resultText += result.run.stdout;
+
             }
 
             if (result.run.stderr) {
-                text += "\\nERROR:\\n";
-                text += result.run.stderr;
+
+                resultText += "\\nERROR:\\n";
+
+                resultText += result.run.stderr;
+
             }
 
             if (result.run.code !== 0) {
-                text += "\\nProgram exited with code: "
-                    + result.run.code;
+
+                resultText += "\\nExit Code: ";
+
+                resultText += result.run.code;
+
             }
+
         }
 
-        outputBox.textContent =
-            text || "Program executed. No output.";
+        output.textContent =
+            resultText || "Program executed. No output.";
 
-        statusBox.textContent =
-            result.run && result.run.code === 0
-                ? "✅ Program executed successfully."
-                : "Program finished. Check output.";
+        status.textContent =
+            "✅ Program execution finished.";
 
-    } catch (error) {
+    } catch(error) {
 
-        outputBox.textContent =
-            "Unable to connect to compiler.\\n\\n"
+        output.textContent =
+            "Compiler connection failed.\\n\\n"
             + error.message
-            + "\\n\\nCheck your internet connection and try again.";
+            + "\\n\\nCheck internet and try again.";
 
-        statusBox.textContent =
-            "❌ Compiler connection failed.";
+        status.textContent =
+            "❌ Compiler unavailable.";
+
     }
+
 }
 
 
-/* ===============================
-   12. KEYBOARD SHORTCUT
-================================ */
+/* RESIZE EDITOR */
 
-editor.setOption("extraKeys", {
+window.addEventListener("resize", function() {
 
-    "Ctrl-Enter": function() {
-        runCode();
-    },
-
-    "Cmd-Enter": function() {
-        runCode();
-    },
-
-    Tab: function(cm) {
-        cm.replaceSelection("    ", "end");
+    if (editor) {
+        editor.refresh();
     }
 
 });
