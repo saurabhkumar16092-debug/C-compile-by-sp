@@ -1,433 +1,960 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
-<meta name="google-site-verification" content="PnEzym5TDHD1qt3sfGdv5199iC9TrZ78o5uynPiIC-k">
-<title>Campus C Lab by SP - Online C Compiler</title>
-<link rel="icon" type="image/png" sizes="512x512" href="logo.png">
-<link rel="shortcut icon" href="logo.png">
-<link rel="apple-touch-icon" href="logo.png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/dracula.min.css">
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/clike/clike.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus C Lab by SP</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation}
-html,body{width:100%;height:100vh;height:100dvh;overflow:hidden;background:#11111b;color:#cdd6f4;font-family:sans-serif}
-body{display:flex;flex-direction:column}
-header{background:#181825;padding:10px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #313244;gap:6px;flex-wrap:nowrap}
-header h1{font-size:15px;color:#89b4fa;white-space:nowrap}
-.btns{display:flex;gap:6px;align-items:center}
-select,button{border:none;padding:8px 11px;border-radius:7px;font-weight:bold;font-size:13px;cursor:pointer}
-select{background:#313244;color:#cdd6f4;max-width:98px}
-#runBtn{background:#a6e3a1;color:#11111b;padding:8px 14px;font-size:14px}
-#runBtn:disabled{background:#585b70;color:#cdd6f4}
-#clearBtn,#histBtn,#fontBtn{background:#313244;color:#cdd6f4}
-.ed-box{flex:1;display:flex;flex-direction:column;border-bottom:2px solid #45475a;min-height:0;background:#282a36}
-.lbl{background:#1e1e2e;color:#a6adc8;font-size:12px;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #282a36}
-.editor-wrap{flex:1;display:flex;position:relative;overflow:hidden;min-height:0}
-#lineNums{background:#21222c;color:#6272a4;padding:12px 6px;font-family:monospace;font-size:17px;line-height:1.5;text-align:right;user-select:none;overflow:hidden;min-width:34px;border-right:1px solid #343746}
-textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 10px;font-family:monospace;font-size:17px;line-height:1.5;resize:none;outline:none;white-space:pre;overflow:auto}
-.CodeMirror{flex:1;height:100%!important;font-family:monospace;font-size:17px;line-height:1.5}
-.CodeMirror textarea, input, textarea { font-size: 16px !important; }
-.term-box{flex:1;display:flex;flex-direction:column;background:#0b0b12;min-height:0}
-#out{flex:1;padding:12px;font-family:monospace;font-size:17px;line-height:1.5;color:#a6e3a1;overflow-y:auto;white-space:pre-wrap;word-break:break-word;cursor:text}
-.u-in{color:#89dceb;font-weight:bold}
-.err{color:#f38ba8}
-.sys{color:#f9e2af;font-style:italic}
-.hint{color:#94e2d5;font-size:15px}
-.inline-inp{
-  background:transparent;
-  border:none;
-  border-bottom:1px dashed #89b4fa;
-  color:#89dceb;
-  font-family:monospace;
-  font-size:17px;
-  font-weight:bold;
-  outline:none;
-  width:140px;
-  min-width:60px;
-  caret-color:#a6e3a1;
-  padding:0 2px;
-  vertical-align:baseline;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
-#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99;justify-content:center;align-items:center;padding:15px}
-.m-box{background:#1e1e2e;border:1px solid #45475a;border-radius:10px;width:100%;max-width:440px;max-height:75vh;display:flex;flex-direction:column;overflow:hidden}
-.m-head{background:#181825;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
-#hList{padding:10px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
-.h-item{background:#11111b;border:1px solid #313244;border-radius:6px;padding:9px;cursor:pointer}
+
+body {
+    font-family: system-ui, Arial, sans-serif;
+    background: #0b1120;
+    color: #e5e7eb;
+    min-height: 100vh;
+}
+
+header {
+    padding: 15px;
+    background: #111827;
+    border-bottom: 1px solid #273449;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #38bdf8;
+}
+
+.logo small {
+    display: block;
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: normal;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+button, select {
+    padding: 9px 12px;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    background: #1e293b;
+    color: white;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+button:hover {
+    background: #334155;
+}
+
+.run-btn {
+    background: #16a34a;
+    border: none;
+    font-weight: bold;
+}
+
+.run-btn:hover {
+    background: #15803d;
+}
+
+main {
+    max-width: 1100px;
+    margin: auto;
+    padding: 15px;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+.toolbar select {
+    flex: 1;
+    min-width: 160px;
+}
+
+.editor-box {
+    border: 1px solid #334155;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.editor-title {
+    padding: 10px 12px;
+    background: #111827;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.CodeMirror {
+    height: 390px;
+    font-size: 14px;
+    font-family: Consolas, monospace;
+}
+
+.CodeMirror-gutters {
+    border-right: 1px solid #334155;
+}
+
+.CodeMirror-scroll {
+    min-height: 390px;
+}
+
+.bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.panel {
+    border: 1px solid #334155;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #111827;
+}
+
+.panel-title {
+    padding: 11px;
+    background: #1e293b;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.panel-body {
+    padding: 12px;
+}
+
+#stdin {
+    width: 100%;
+    min-height: 100px;
+    resize: vertical;
+    background: #0b1120;
+    color: #e5e7eb;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+#output {
+    min-height: 100px;
+    max-height: 300px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background: #020617;
+    color: #4ade80;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.status {
+    padding: 10px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px 10px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.light {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.light header,
+.light .editor-title,
+.light .panel-title {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.light .panel {
+    background: white;
+}
+
+.light .CodeMirror {
+    border-color: #cbd5e1;
+}
+
+.light #stdin {
+    background: white;
+    color: #111827;
+}
+
+.light #output {
+    background: #f8fafc;
+    color: #166534;
+}
+
+.light button,
+.light select {
+    background: white;
+    color: #111827;
+    border-color: #cbd5e1;
+}
+
+.light .run-btn {
+    background: #16a34a;
+    color: white;
+}
+
+@media(max-width: 650px) {
+    header {
+        align-items: flex-start;
+    }
+
+    .bottom-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .CodeMirror {
+        height: 340px;
+        font-size: 13px;
+    }
+
+    main {
+        padding: 10px;
+    }
+
+    button {
+        padding: 8px 10px;
+    }
+}
 </style>
 </head>
+
 <body>
+
 <header>
-  <h1>⚡ C Lab</h1>
-  <div class="btns">
-    <button id="fontBtn" type="button" onclick="toggleFont()" title="Font Size">A+</button>
-    <button id="histBtn" type="button" onclick="openHist()">🕒</button>
-    <select id="exSel" onchange="loadEx()">
-      <option value="">📂 Examples</option>
-      <option value="add">1. Add 2 Numbers</option>
-      <option value="matrix">2. Matrix Sum</option>
-      <option value="matmul">3. Matrix Multiply</option>
-      <option value="prime">4. Prime Check</option>
-      <option value="fact">5. Factorial</option>
-    </select>
-    <button id="clearBtn" type="button" onclick="clrTerm()">Clear</button>
-    <button id="runBtn" type="button" onclick="runCode()">▶ Run</button>
-  </div>
+    <div class="logo">
+        Campus C Lab
+        <small>by SP | Online C Programming Lab</small>
+    </div>
+
+    <div class="header-buttons">
+        <button onclick="toggleTheme()">🌙 Theme</button>
+        <button onclick="showHistory()">📚 History</button>
+    </div>
 </header>
 
-<div class="ed-box">
-  <div class="lbl"><span>main.c <span id="svTxt" style="color:#a6e3a1">• Saved</span></span><span>By SP</span></div>
-  <div class="editor-wrap" id="edWrap">
-    <div id="lineNums">1</div>
-    <textarea id="code" spellcheck="false">#include <stdio.h>
+<main>
+
+    <div class="toolbar">
+
+        <select id="examples" onchange="loadExample()">
+            <option value="">📖 Select C Example</option>
+            <option value="hello">Hello World</option>
+            <option value="addition">Addition</option>
+            <option value="subtraction">Subtraction</option>
+            <option value="multiplication">Multiplication</option>
+            <option value="evenodd">Even or Odd</option>
+            <option value="largest">Largest Number</option>
+            <option value="loop">For Loop</option>
+            <option value="table">Multiplication Table</option>
+            <option value="factorial">Factorial</option>
+            <option value="prime">Prime Number</option>
+            <option value="array">Array</option>
+            <option value="function">Function</option>
+        </select>
+
+        <button onclick="copyCode()">📋 Copy</button>
+        <button onclick="downloadCode()">⬇ Download</button>
+        <button onclick="clearCode()">🗑 Clear</button>
+        <button class="run-btn" onclick="runCode()">▶ RUN</button>
+    </div>
+
+    <div class="editor-box">
+
+        <div class="editor-title">
+            <span>📄 main.c</span>
+            <span id="saveStatus">Auto Save ON</span>
+        </div>
+
+        <textarea id="code"></textarea>
+
+    </div>
+
+    <div class="bottom-grid">
+
+        <div class="panel">
+
+            <div class="panel-title">
+                ⌨️ Program Input (scanf)
+            </div>
+
+            <div class="panel-body">
+                <textarea id="stdin" placeholder="Enter input values here.
+Example:
+10
+20
+
+For scanf, values can be separated by spaces or new lines."></textarea>
+            </div>
+
+        </div>
+
+        <div class="panel">
+
+            <div class="panel-title">
+                💻 Output Terminal
+            </div>
+
+            <div class="panel-body">
+                <div id="output">Your program output will appear here...</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="status" id="status">
+        Ready | C Language | Compiler connected through API when Run is pressed
+    </div>
+
+</main>
+
+<footer>
+    Campus C Lab by SP · Learn C Programming
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+
+<script>
+
+/* ===============================
+   1. STARTING CODE
+================================ */
+
+const starterCode = `#include <stdio.h>
 
 int main() {
     int a, b, sum;
-    printf("Enter first and second number: ");
+
+    printf("Enter two numbers: ");
     scanf("%d %d", &a, &b);
+
     sum = a + b;
-    printf("Sum of two numbers = %d\n", sum);
+
+    printf("Sum = %d\\\\n", sum);
+
     return 0;
-}</textarea>
-  </div>
-</div>
+}`;
 
-<div class="term-box" onclick="focusInline()">
-  <div class="lbl"><span>Terminal Output</span><span id="stTxt" style="color:#89b4fa">Ready</span></div>
-  <div id="out">▶ 'Run' dabane ke baad yahan output aayega aur wahin samne cursor par aap value likh sakte hain...</div>
-</div>
 
-<div id="modal" onclick="if(event.target===this)this.style.display='none'">
-  <div class="m-box">
-    <div class="m-head"><h3 style="font-size:14px;color:#89b4fa">🕒 Saved History</h3><button type="button" style="background:#f38ba8;color:#11111b" onclick="document.getElementById('modal').style.display='none'">✕</button></div>
-    <div id="hList"></div>
-  </div>
-</div>
+/* ===============================
+   2. CODE EXAMPLES
+================================ */
 
-<script>
-const EX={
-  add:`#include <stdio.h>\n\nint main() {\n    int a, b, sum;\n    printf("Enter first and second number: ");\n    scanf("%d %d", &a, &b);\n    sum = a + b;\n    printf("Sum of two numbers = %d\\n", sum);\n    return 0;\n}`,
-  matrix:`#include <stdio.h>\n\nint main() {\n    int r, c, i, j, A[10][10], B[10][10], sum[10][10];\n    printf("Rows aur columns enter karein: ");\n    scanf("%d %d", &r, &c);\n    printf("Pehli matrix ke elements:\\n");\n    for(i=0;i<r;i++) for(j=0;j<c;j++) scanf("%d",&A[i][j]);\n    printf("Doosri matrix ke elements:\\n");\n    for(i=0;i<r;i++) for(j=0;j<c;j++) scanf("%d",&B[i][j]);\n    for(i=0;i<r;i++) for(j=0;j<c;j++) sum[i][j]=A[i][j]+B[i][j];\n    printf("Matrices ka jod:\\n");\n    for(i=0;i<r;i++){for(j=0;j<c;j++)printf("%d\\t",sum[i][j]);printf("\\n");}\n    return 0;\n}`,
-  matmul:`#include <stdio.h>\n#define MAX 10\n\nint main() {\n    int a[MAX][MAX], b[MAX][MAX], c[MAX][MAX];\n    int r1, c1, r2, c2;\n\n    printf("Pehle matrix ki rows aur columns darj karein: ");\n    scanf("%d %d", &r1, &c1);\n\n    printf("Doosre matrix ki rows aur columns darj karein: ");\n    scanf("%d %d", &r2, &c2);\n\n    if (c1 != r2) {\n        printf("Guna sambhav nahi hai: pehle matrix ke columns, doosre ke rows ke barabar hone chahiye.\\n");\n        return 1;\n    }\n\n    printf("Pehle matrix ke elements darj karein:\\n");\n    for (int i = 0; i < r1; i++)\n        for (int j = 0; j < c1; j++)\n            scanf("%d", &a[i][j]);\n\n    printf("Doosre matrix ke elements darj karein:\\n");\n    for (int i = 0; i < r2; i++)\n        for (int j = 0; j < c2; j++)\n            scanf("%d", &b[i][j]);\n\n    for (int i = 0; i < r1; i++) {\n        for (int j = 0; j < c2; j++) {\n            c[i][j] = 0;\n            for (int k = 0; k < c1; k++)\n                c[i][j] += a[i][k] * b[k][j];\n        }\n    }\n\n    printf("Parinam matrix:\\n");\n    for (int i = 0; i < r1; i++) {\n        for (int j = 0; j < c2; j++)\n            printf("%d\\t", c[i][j]);\n        printf("\\n");\n    }\n    return 0;\n}`,
-  prime:`#include <stdio.h>\n\nint main() {\n    int n, i, flag=0;\n    printf("Number enter karein: ");\n    scanf("%d", &n);\n    if(n<=1) flag=1;\n    for(i=2;i<=n/2;i++) if(n%i==0){flag=1;break;}\n    printf(flag==0?"%d Prime hai\\n":"%d Prime nahi hai\\n", n);\n    return 0;\n}`,
-  fact:`#include <stdio.h>\n\nint main() {\n    int n, i; unsigned long long f=1;\n    printf("Number enter karein: ");\n    scanf("%d", &n);\n    for(i=1;i<=n;i++) f*=i;\n    printf("Factorial = %llu\\n", f);\n    return 0;\n}`
+const examples = {
+
+hello: `#include <stdio.h>
+
+int main() {
+    printf("Hello World!");
+
+    return 0;
+}`,
+
+addition: `#include <stdio.h>
+
+int main() {
+    int a, b, sum;
+
+    printf("Enter two numbers: ");
+    scanf("%d %d", &a, &b);
+
+    sum = a + b;
+
+    printf("Sum = %d\\\\n", sum);
+
+    return 0;
+}`,
+
+subtraction: `#include <stdio.h>
+
+int main() {
+    int a, b;
+
+    printf("Enter two numbers: ");
+    scanf("%d %d", &a, &b);
+
+    printf("Difference = %d\\\\n", a - b);
+
+    return 0;
+}`,
+
+multiplication: `#include <stdio.h>
+
+int main() {
+    int a, b;
+
+    printf("Enter two numbers: ");
+    scanf("%d %d", &a, &b);
+
+    printf("Product = %d\\\\n", a * b);
+
+    return 0;
+}`,
+
+evenodd: `#include <stdio.h>
+
+int main() {
+    int n;
+
+    printf("Enter a number: ");
+    scanf("%d", &n);
+
+    if (n % 2 == 0) {
+        printf("Even Number");
+    } else {
+        printf("Odd Number");
+    }
+
+    return 0;
+}`,
+
+largest: `#include <stdio.h>
+
+int main() {
+    int a, b;
+
+    printf("Enter two numbers: ");
+    scanf("%d %d", &a, &b);
+
+    if (a > b) {
+        printf("Largest = %d", a);
+    } else {
+        printf("Largest = %d", b);
+    }
+
+    return 0;
+}`,
+
+loop: `#include <stdio.h>
+
+int main() {
+
+    for (int i = 1; i <= 10; i++) {
+        printf("%d\\\\n", i);
+    }
+
+    return 0;
+}`,
+
+table: `#include <stdio.h>
+
+int main() {
+    int n;
+
+    printf("Enter number: ");
+    scanf("%d", &n);
+
+    for (int i = 1; i <= 10; i++) {
+        printf("%d x %d = %d\\\\n", n, i, n * i);
+    }
+
+    return 0;
+}`,
+
+factorial: `#include <stdio.h>
+
+int main() {
+    int n;
+    long long fact = 1;
+
+    printf("Enter number: ");
+    scanf("%d", &n);
+
+    for (int i = 1; i <= n; i++) {
+        fact = fact * i;
+    }
+
+    printf("Factorial = %lld", fact);
+
+    return 0;
+}`,
+
+prime: `#include <stdio.h>
+
+int main() {
+    int n, i, prime = 1;
+
+    printf("Enter number: ");
+    scanf("%d", &n);
+
+    if (n <= 1) {
+        prime = 0;
+    }
+
+    for (i = 2; i * i <= n; i++) {
+        if (n % i == 0) {
+            prime = 0;
+            break;
+        }
+    }
+
+    if (prime)
+        printf("Prime Number");
+    else
+        printf("Not Prime");
+
+    return 0;
+}`,
+
+array: `#include <stdio.h>
+
+int main() {
+    int arr[5];
+    int i;
+
+    printf("Enter 5 numbers: ");
+
+    for (i = 0; i < 5; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    printf("Array Elements:\\\\n");
+
+    for (i = 0; i < 5; i++) {
+        printf("%d ", arr[i]);
+    }
+
+    return 0;
+}`,
+
+function: `#include <stdio.h>
+
+int add(int a, int b) {
+    return a + b;
+}
+
+int main() {
+    int x, y;
+
+    printf("Enter two numbers: ");
+    scanf("%d %d", &x, &y);
+
+    printf("Sum = %d", add(x, y));
+
+    return 0;
+}`
 };
 
-const ta=document.getElementById('code'), ln=document.getElementById('lineNums');
-let cm=null;
-let curFont=16;
 
-function toggleFont(){
-  curFont = curFont===17 ? 20 : (curFont===20 ? 16 : 17);
-  document.getElementById('fontBtn').textContent = curFont===20 ? 'A-' : 'A+';
-  ta.style.fontSize = curFont+'px';
-  ln.style.fontSize = curFont+'px';
-  document.getElementById('out').style.fontSize = curFont+'px';
-  const cmEl=document.querySelector('.CodeMirror');
-  if(cmEl){
-    cmEl.style.fontSize = curFont+'px';
-    if(cm) cm.refresh();
-  }
-}
+/* ===============================
+   3. CODE EDITOR
+================================ */
 
-function updLines(){
-  const n=ta.value.split('\n').length;
-  ln.innerHTML=Array.from({length:n},(_,i)=>i+1).join('<br>');
-}
-ta.addEventListener('scroll',()=>{ln.scrollTop=ta.scrollTop});
-
-function tryCM(){
-  if(typeof CodeMirror!=='undefined' && !cm){
-    const v=ta.value;
-    ln.style.display='none';
-    cm=CodeMirror.fromTextArea(ta,{mode:'text/x-csrc',theme:'dracula',lineNumbers:true,indentUnit:4,tabSize:4,lineWrapping:true,inputStyle:'contenteditable',viewportMargin:Infinity});cm.getWrapperElement().addEventListener('cut',e=>{const s=window.getSelection(),v=cm.getValue();if(s&&s.toString().replace(/\s/g,'')===v.replace(/\s/g,'')){e.preventDefault();if(e.clipboardData)e.clipboardData.setData('text/plain',v);cm.setValue('');}});
-    cm.setValue(v);
-    cm.on('change',onChg);
-  }
-}
-tryCM();
-window.addEventListener('load',tryCM);
-
-const getC=()=>cm?cm.getValue():ta.value;
-const setC=v=>{if(cm)cm.setValue(v);else{ta.value=v;updLines();}};
-
-const sv=localStorage.getItem('sp_c_code');
-if(sv&&sv.trim()) setC(sv);
-updLines();
-
-function onChg(){
-  updLines();
-  localStorage.setItem('sp_c_code',getC());
-  document.getElementById('svTxt').textContent='• Saved';
-}
-ta.addEventListener('input',onChg);
-
-function saveHist(c){
-  if(!c.trim())return;
-  let h=JSON.parse(localStorage.getItem('sp_c_hist')||'[]');
-  if(h.length&&h[0].c.trim()===c.trim())return;
-  h.unshift({t:new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),c});
-  localStorage.setItem('sp_c_hist',JSON.stringify(h.slice(0,50)));
-}
-
-function openHist(){
-  const list=document.getElementById('hList'), h=JSON.parse(localStorage.getItem('sp_c_hist')||'[]');
-  list.innerHTML=h.length?'':'<p style="font-size:13px;color:#a6adc8">Koi saved program nahi hai.</p>';
-  h.forEach((x,i)=>{
-    const d=document.createElement('div');d.className='h-item';
-    d.innerHTML=`<div style="font-size:11px;color:#f9e2af">#${i+1} • ${x.t}</div><div style="font-family:monospace;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(x.c.replace(/\n/g,' '))}</div>`;
-    d.onclick=()=>{setC(x.c);document.getElementById('modal').style.display='none';clrTerm();};
-    list.appendChild(d);
-  });
-  document.getElementById('modal').style.display='flex';
-}
-
-function loadEx(){
-  const s=document.getElementById('exSel');
-  if(s.value&&EX[s.value]){saveHist(getC());setC(EX[s.value]);clrTerm();}
-  s.value='';
-}
-
-const out=document.getElementById('out'),rBtn=document.getElementById('runBtn'),st=document.getElementById('stTxt');
-let grps=[],toks=[],gIdx=0,tInG=0,running=false,vars={},activeInp=null;
-
-function focusInline(){
-  if(activeInp) activeInp.focus();
-}
-
-function clrTerm(){
-  activeInp=null;
-  out.innerHTML='';
-  st.textContent='Ready';
-}
-
-function parseCode(code){
-  const cl=code.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/.*$/gm,''),lines=cl.split('\n'),res=[];
-  let p='',loops=[],inIf=false;
-  lines.forEach((l,i)=>{
-    const t=l.trim();
-    if(/^if\s*\(/.test(t)){
-      if(t.includes('{')) inIf=true;
-      return;
+const editor = CodeMirror.fromTextArea(
+    document.getElementById("code"),
+    {
+        mode: "text/x-csrc",
+        theme: "dracula",
+        lineNumbers: true,
+        indentUnit: 4,
+        tabSize: 4,
+        lineWrapping: false,
+        autoCloseBrackets: true,
+        matchBrackets: true
     }
-    if(inIf){if(t.includes('}'))inIf=false;return;}
-    const fm=t.match(/\bfor\s*\([^;]*;\s*[a-zA-Z_]\w*\s*(<=|<)\s*([a-zA-Z0-9_]+)\s*;/);
-    if(fm)loops.push({op:fm[1],b:fm[2],i});
-    const pm=t.match(/\bprintf\s*\(\s*"((?:[^"\\]|\\.)*)"\s*\)\s*;/);
-    if(pm&&!/%[sdfclux]/i.test(pm[1]))p+=pm[1].replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\"/g,'"');
-    const sm=t.match(/\bscanf\s*\(\s*"([^"]*)"\s*,\s*([^)]+)\)/);
-    if(sm){
-      const sp=sm[1].match(/%[0-9.]*[diuoxXfFeEgGaAcsp]/g)||['%d'];
-      const vn=sm[2].split(',').map(v=>v.replace(/&/g,'').trim());
-      res.push({p:p||'Enter value: ',cnt:sp.length,sp,vn,lp:loops.filter(x=>i-x.i<=4)});
-      p='';loops=[];
+);
+
+
+/* ===============================
+   4. AUTO SAVE
+================================ */
+
+const savedCode = localStorage.getItem("campus_c_code");
+
+editor.setValue(savedCode || starterCode);
+
+editor.on("change", function() {
+
+    localStorage.setItem(
+        "campus_c_code",
+        editor.getValue()
+    );
+
+    document.getElementById("saveStatus").textContent =
+        "✓ Auto Saved";
+
+});
+
+
+/* ===============================
+   5. LOAD EXAMPLE
+================================ */
+
+function loadExample() {
+
+    const selected = document.getElementById("examples").value;
+
+    if (!selected) return;
+
+    editor.setValue(examples[selected]);
+
+    document.getElementById("stdin").value = "";
+
+    document.getElementById("output").textContent =
+        "Example loaded. Click RUN to execute.";
+
+    document.getElementById("status").textContent =
+        "Example loaded: " + selected;
+}
+
+
+/* ===============================
+   6. COPY CODE
+================================ */
+
+async function copyCode() {
+
+    try {
+
+        await navigator.clipboard.writeText(
+            editor.getValue()
+        );
+
+        document.getElementById("status").textContent =
+            "Code copied successfully!";
+
+    } catch (error) {
+
+        editor.focus();
+        editor.execCommand("selectAll");
+
+        document.getElementById("status").textContent =
+            "Select code and copy manually.";
+
     }
-  });
-  return res;
 }
 
-function expCnt(g){
-  let m=1;
-  g.lp.forEach(x=>{let b=parseInt(x.b,10);if(isNaN(b))b=vars[x.b]!==undefined?vars[x.b]:1;if(x.op==='<=')b++;if(b>0)m*=b;});
-  return g.cnt*m;
+
+/* ===============================
+   7. DOWNLOAD CODE
+================================ */
+
+function downloadCode() {
+
+    const code = editor.getValue();
+
+    const blob = new Blob(
+        [code],
+        { type: "text/plain" }
+    );
+
+    const link = document.createElement("a");
+
+    link.href = URL.createObjectURL(blob);
+    link.download = "main.c";
+
+    link.click();
+
+    URL.revokeObjectURL(link.href);
+
+    document.getElementById("status").textContent =
+        "C file downloaded.";
 }
 
-async function runCode(){
-  const c=getC();saveHist(c);toks=[];gIdx=0;tInG=0;vars={};running=true;activeInp=null;out.innerHTML='';rBtn.disabled=true;
-  grps=parseCode(c);
-  if(grps.length)showP(true);else await execAPI();
-}
 
-function showP(first){
-  const g=grps[gIdx],tot=expCnt(g),rem=tot-tInG;
-  const promptSpan=document.createElement('span');
-  if(first){
-    promptSpan.textContent=g.p;
-  }else{
-    promptSpan.className='hint';
-    promptSpan.textContent=`↳ (${rem} aur): `;
-  }
-  out.appendChild(promptSpan);
+/* ===============================
+   8. CLEAR EDITOR
+================================ */
 
-  const inp=document.createElement('input');
-  inp.type='text';
-  inp.className='inline-inp';
-  inp.style.fontSize=curFont+'px';
-  inp.autocomplete='off';
-  inp.autocorrect='off';
-  inp.spellcheck=false;
-  inp.addEventListener('input',()=>{
-    inp.style.width=Math.max(80,(inp.value.length+2)*11)+'px';
-  });
-  inp.addEventListener('keydown',e=>{
-    if(e.key==='Enter'){
-      e.preventDefault();
-      sendIn(inp);
+function clearCode() {
+
+    if (confirm("Clear the complete code?")) {
+
+        editor.setValue("");
+
+        document.getElementById("stdin").value = "";
+
+        document.getElementById("output").textContent =
+            "Editor cleared.";
+
+        document.getElementById("status").textContent =
+            "Code cleared.";
     }
-  });
-
-  out.appendChild(inp);
-  activeInp=inp;
-  out.scrollTop=out.scrollHeight;
-  st.textContent=`Input (${tInG}/${tot})`;
-  setTimeout(()=>inp.focus(),10);
 }
 
-async function sendIn(inp){
-  if(!running||!inp)return;
-  const raw=inp.value.trim();
-  if(!raw){
-    inp.placeholder='value likhein...';
-    inp.focus();
-    return;
-  }
-  const g=grps[gIdx],tot=expCnt(g),nt=raw.split(/\s+/);
-  for(let i=0;i<nt.length;i++){
-    const sp=g.sp[(tInG+i)%g.sp.length];
-    if(/%[diu]/i.test(sp)&&!/^-?\d+$/.test(nt[i])){
-      const errSpan=document.createElement('span');
-      errSpan.className='err';
-      errSpan.textContent=`\n⚠ '${nt[i]}' number nahi hai! Dobara likhein: `;
-      inp.replaceWith(document.createTextNode(raw));
-      out.appendChild(errSpan);
-      const retryInp=document.createElement('input');
-      retryInp.type='text';
-      retryInp.className='inline-inp';
-      retryInp.style.fontSize=curFont+'px';
-      retryInp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendIn(retryInp);}});
-      out.appendChild(retryInp);
-      activeInp=retryInp;
-      out.scrollTop=out.scrollHeight;
-      retryInp.focus();
-      return;
+
+/* ===============================
+   9. HISTORY
+================================ */
+
+function saveHistory(code) {
+
+    let history = JSON.parse(
+        localStorage.getItem("campus_c_history") || "[]"
+    );
+
+    history.unshift({
+        code: code,
+        date: new Date().toLocaleString()
+    });
+
+    history = history.slice(0, 20);
+
+    localStorage.setItem(
+        "campus_c_history",
+        JSON.stringify(history)
+    );
+}
+
+
+function showHistory() {
+
+    let history = JSON.parse(
+        localStorage.getItem("campus_c_history") || "[]"
+    );
+
+    if (history.length === 0) {
+        alert("No code history saved yet.");
+        return;
     }
-  }
 
-  const valSpan=document.createElement('span');
-  valSpan.className='u-in';
-  valSpan.textContent=raw+'\n';
-  inp.replaceWith(valSpan);
-  activeInp=null;
+    let message = "CODE HISTORY\\n\\n";
 
-  if(g.lp.length===0)nt.forEach((t,i)=>{const v=g.vn[tInG+i];if(v&&!isNaN(parseInt(t,10)))vars[v]=parseInt(t,10);});
-  toks.push(...nt);
-  tInG+=nt.length;
+    history.forEach((item, index) => {
+        message += (index + 1) + ". " + item.date + "\\n";
+    });
 
-  if(tInG<tot)showP(false);
-  else{
-    gIdx++;tInG=0;
-    if(gIdx<grps.length)showP(true);
-    else await execAPI();
-  }
-}
+    let choice = prompt(
+        message + "\\nEnter history number to restore:"
+    );
 
-function toBase64(str){
-  return btoa(unescape(encodeURIComponent(str)));
-}
-function fromBase64(str){
-  if(!str) return '';
-  try{return decodeURIComponent(escape(atob(str)));}catch(e){return atob(str);}
-}
+    if (choice === null) return;
 
-async function fetchWithTimeout(url, opts, ms=7500){
-  const ctrl=new AbortController();
-  const id=setTimeout(()=>ctrl.abort(),ms);
-  try{
-    const res=await fetch(url,{...opts,signal:ctrl.signal});
-    clearTimeout(id);
-    return res;
-  }catch(e){
-    clearTimeout(id);
-    throw e;
-  }
-}
+    let index = Number(choice) - 1;
 
-async function runJudge0(code, stdinStr){
-  const r=await fetchWithTimeout('https://ce.judge0.com/submissions/?base64_encoded=true&wait=true',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      source_code:toBase64(code),
-      language_id:50,
-      stdin:toBase64(stdinStr)
-    })
-  },8500);
-  if(!r.ok) throw new Error('Judge0 HTTP '+r.status);
-  const d=await r.json();
-  if(d.compile_output){
-    return {compileErr:fromBase64(d.compile_output)};
-  }
-  return {
-    stdout:fromBase64(d.stdout),
-    stderr:fromBase64(d.stderr) || (d.message?fromBase64(d.message):''),
-    exitCode:d.exit_code ?? (d.status && d.status.id===3 ? 0 : 1)
-  };
-}
+    if (index >= 0 && index < history.length) {
 
-async function runWandbox(code, stdinStr){
-  const r=await fetchWithTimeout('https://wandbox.org/api/compile.json',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({compiler:'gcc-head-c',code:code,stdin:stdinStr,save:false})
-  },7000);
-  if(!r.ok) throw new Error('Wandbox HTTP '+r.status);
-  const d=await r.json();
-  if(d.program_error && d.program_error.includes('Resource temporarily unavailable')){
-    throw new Error('Busy');
-  }
-  if(d.compiler_error){
-    return {compileErr:d.compiler_error};
-  }
-  return {
-    stdout:d.program_output||'',
-    stderr:d.program_error||'',
-    exitCode:d.status??0
-  };
-}
+        editor.setValue(history[index].code);
 
-async function execAPI(){
-  st.textContent='Compiling (GCC)...';
-  const code=getC();
-  const stdinStr=toks.length?toks.join('\n')+'\n':'';
-
-  let result=null;
-
-  try{
-    result=await Promise.any([
-      runJudge0(code, stdinStr),
-      runWandbox(code, stdinStr)
-    ]);
-  }catch(allErr){
-    try{
-      st.textContent='Retrying GCC...';
-      result=await runJudge0(code, stdinStr);
-    }catch(retryErr){}
-  }
-
-  if(result){
-    if(result.compileErr){
-      out.innerHTML=`<span class="err">Compilation Error:\n${esc(result.compileErr)}</span>`;
-      done('Error');return;
+        document.getElementById("status").textContent =
+            "History restored.";
     }
-    let rem=result.stdout||'';
-    grps.forEach(g=>{if(rem.startsWith(g.p))rem=rem.slice(g.p.length);});
-    if(rem)out.innerHTML+=esc(rem);
-    if(result.stderr)out.innerHTML+=`\n<span class="err">${esc(result.stderr)}</span>`;
-    out.innerHTML+=`\n\n<span class="sys">--- Finished (Exit Code: ${result.exitCode}) ---</span>`;
-    out.scrollTop=out.scrollHeight;
-    done('Finished');
-    return;
-  }
-
-  out.innerHTML+=`\n<span class="err">Network Error: Compiler server se connect nahi ho paya. Apna internet connection check karein aur dubara Run dabayein.</span>`;
-  done('Failed');
 }
 
-function done(s){running=false;rBtn.disabled=false;activeInp=null;st.textContent=s;}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ===============================
+   10. THEME
+================================ */
+
+function toggleTheme() {
+
+    document.body.classList.toggle("light");
+
+    const isLight = document.body.classList.contains("light");
+
+    editor.setOption(
+        "theme",
+        isLight ? "default" : "dracula"
+    );
+
+    localStorage.setItem(
+        "campus_c_theme",
+        isLight ? "light" : "dark"
+    );
+}
+
+
+if (localStorage.getItem("campus_c_theme") === "light") {
+    document.body.classList.add("light");
+    editor.setOption("theme", "default");
+}
+
+
+/* ===============================
+   11. RUN C PROGRAM
+================================ */
+
+async function runCode() {
+
+    const code = editor.getValue();
+
+    const input = document.getElementById("stdin").value;
+
+    const outputBox = document.getElementById("output");
+
+    const statusBox = document.getElementById("status");
+
+    if (!code.trim()) {
+
+        outputBox.textContent = "Please write some C code first.";
+
+        return;
+    }
+
+    outputBox.textContent = "⏳ Compiling and running...";
+    statusBox.textContent = "Connecting to C Compiler...";
+
+    saveHistory(code);
+
+    try {
+
+        const response = await fetch(
+            "https://emkc.org/api/v2/piston/execute",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    language: "c",
+                    version: "*",
+
+                    files: [
+                        {
+                            name: "main.c",
+                            content: code
+                        }
+                    ],
+
+                    stdin: input,
+
+                    args: [],
+
+                    compile_timeout: 10000,
+                    run_timeout: 3000,
+                    compile_memory_limit: -1,
+                    run_memory_limit: -1
+                })
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                "Compiler API error: " + response.status
+            );
+        }
+
+        const result = await response.json();
+
+        let text = "";
+
+        /* Compiler output */
+
+        if (result.compile) {
+
+            if (result.compile.stderr) {
+                text += "COMPILER MESSAGE:\\n";
+                text += result.compile.stderr + "\\n";
+            }
+
+            if (result.compile.output) {
+                text += result.compile.output + "\\n";
+            }
+
+            if (result.compile.code !== 0) {
+
+                outputBox.textContent =
+                    text || "Compilation failed.";
+
+                statusBox.textContent =
+                    "❌ Compilation Error";
+
+                return;
+            }
+        }
+
+        /* Program output */
+
+        if (result.run) {
+
+            if (result.run.stdout) {
+                text += "\\nOUTPUT:\\n";
+                text += result.run.stdout;
+            }
+
+            if (result.run.stderr) {
+                text += "\\nERROR:\\n";
+                text += result.run.stderr;
+            }
+
+            if (result.run.code !== 0) {
+                text += "\\nProgram exited with code: "
+                    + result.run.code;
+            }
+        }
+
+        outputBox.textContent =
+            text || "Program executed. No output.";
+
+        statusBox.textContent =
+            result.run && result.run.code === 0
+                ? "✅ Program executed successfully."
+                : "Program finished. Check output.";
+
+    } catch (error) {
+
+        outputBox.textContent =
+            "Unable to connect to compiler.\\n\\n"
+            + error.message
+            + "\\n\\nCheck your internet connection and try again.";
+
+        statusBox.textContent =
+            "❌ Compiler connection failed.";
+    }
+}
+
+
+/* ===============================
+   12. KEYBOARD SHORTCUT
+================================ */
+
+editor.setOption("extraKeys", {
+
+    "Ctrl-Enter": function() {
+        runCode();
+    },
+
+    "Cmd-Enter": function() {
+        runCode();
+    },
+
+    Tab: function(cm) {
+        cm.replaceSelection("    ", "end");
+    }
+
+});
+
 </script>
+
 </body>
 </html>
