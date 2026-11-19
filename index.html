@@ -64,6 +64,7 @@ textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 1
   <h1>⚡ C Lab</h1>
   <div class="btns">
     <button id="fontBtn" type="button" onclick="toggleFont()" title="Font Size">A+</button>
+    <button id="pasteBtn" type="button" onclick="pasteCode()" style="background:#313244;color:#89b4fa" title="Paste Full Code">📋</button>
     <button id="histBtn" type="button" onclick="openHist()">🕒</button>
     <select id="exSel" onchange="loadEx()">
       <option value="">📂 Examples</option>
@@ -132,6 +133,17 @@ function toggleFont(){
     if(cm) cm.refresh();
   }
 }
+  async function pasteCode(){
+  try{
+    const t=await navigator.clipboard.readText();
+    if(t){setC(t);clrTerm();}
+    else alert('Clipboard khali hai!');
+  }catch(e){
+    const t=prompt('Yahan code paste karke OK dabayein:');
+    if(t){setC(t);clrTerm();}
+  }
+  }
+  
 
 function updLines(){
   const n=ta.value.split('\n').length;
