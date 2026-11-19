@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
 <meta name="google-site-verification" content="PnEzym5TDHD1qt3sfGdv5199iC9TrZ78o5uynPiIC-k">
 <title>Campus C Lab by SP - Online C Compiler</title>
-<link rel="icon" type="image/png" href="logo.png">
+<link rel="icon" type="image/png" sizes="512x512" href="logo.png">
+<link rel="shortcut icon" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/dracula.min.css">
@@ -142,7 +143,8 @@ function tryCM(){
   if(typeof CodeMirror!=='undefined' && !cm){
     const v=ta.value;
     ln.style.display='none';
-    cm=CodeMirror.fromTextArea(ta,{mode:'text/x-csrc',theme:'dracula',lineNumbers:true,indentUnit:4,tabSize:4,lineWrapping:true,inputStyle:'contenteditable'});
+    cm=CodeMirror.fromTextArea(ta,{mode:'text/x-csrc',theme:'dracula',lineNumbers:true,indentUnit:4,tabSize:4,lineWrapping:true});
+    
     cm.setValue(v);
     cm.on('change',onChg);
   }
