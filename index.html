@@ -155,7 +155,8 @@ function tryCM(){
   if(typeof CodeMirror!=='undefined' && !cm){
     const v=ta.value;
     ln.style.display='none';
-    cm=CodeMirror.fromTextArea(ta,{mode:'text/x-csrc',theme:'dracula',lineNumbers:true,indentUnit:4,tabSize:4,lineWrapping:true,inputStyle:'contenteditable',viewportMargin:Infinity});cm.getWrapperElement().addEventListener('cut',e=>{const s=window.getSelection(),v=cm.getValue();if(s&&s.toString().replace(/\s/g,'')===v.replace(/\s/g,'')){e.preventDefault();if(e.clipboardData)e.clipboardData.setData('text/plain',v);cm.setValue('');}});
+    cm=CodeMirror.fromTextArea(ta,{mode:'text/x-csrc',theme:'dracula',lineNumbers:true,indentUnit:4,tabSize:4,lineWrapping:true,inputStyle:'contenteditable',viewportMargin:Infinity});const wEl=cm.getWrapperElement();wEl.addEventListener('cut',e=>{const s=window.getSelection(),v=cm.getValue();if(s&&s.toString().replace(/\s/g,'')===v.replace(/\s/g,'')){e.preventDefault();if(e.clipboardData)e.clipboardData.setData('text/plain',v);cm.setValue('');}});wEl.addEventListener('paste',e=>{const t=(e.clipboardData||window.clipboardData)?.getData('text/plain');if(t){e.preventDefault();cm.replaceSelection(t);}});
+    
     cm.setValue(v);
     cm.on('change',onChg);
   }
