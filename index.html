@@ -5,1127 +5,429 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <meta name="google-site-verification" content="PnEzym5TDHD1qt3sfGdv5199iC9TrZ78o5uynPiIC-k">
 <title>Campus C Lab by SP - Online C Compiler</title>
-
 <link rel="icon" type="image/png" sizes="512x512" href="logo.png">
 <link rel="shortcut icon" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/dracula.min.css">
-
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/clike/clike.min.js"></script>
-
 <style>
-*{
- box-sizing:border-box;
- margin:0;
- padding:0;
- touch-action:manipulation;
-}
-
-html,body{
- width:100%;
- height:100vh;
- height:100dvh;
- overflow:hidden;
- background:#11111b;
- color:#cdd6f4;
- font-family:sans-serif;
-}
-
-body{
- display:flex;
- flex-direction:column;
-}
-
-header{
- background:#181825;
- padding:9px;
- display:flex;
- justify-content:space-between;
- align-items:center;
- border-bottom:1px solid #313244;
- gap:6px;
- flex-wrap:nowrap;
-}
-
-header h1{
- font-size:15px;
- color:#89b4fa;
- white-space:nowrap;
-}
-
-.btns{
- display:flex;
- gap:5px;
- align-items:center;
- flex-wrap:wrap;
- justify-content:flex-end;
-}
-
-select,button{
- border:none;
- padding:8px 10px;
- border-radius:7px;
- font-weight:bold;
- font-size:13px;
- cursor:pointer;
-}
-
-select{
- background:#313244;
- color:#cdd6f4;
- max-width:120px;
-}
-
-button{
- background:#313244;
- color:#cdd6f4;
-}
-
-#runBtn{
- background:#a6e3a1;
- color:#11111b;
- padding:8px 14px;
- font-size:14px;
-}
-
-#runBtn:disabled{
- background:#585b70;
- color:#cdd6f4;
-}
-
-#clearBtn,#histBtn,#fontBtn,#inputBtn{
- background:#313244;
- color:#cdd6f4;
-}
-
-#inputBtn.active{
- background:#89b4fa;
- color:#11111b;
-}
-
-.ed-box{
- flex:1;
- display:flex;
- flex-direction:column;
- border-bottom:2px solid #45475a;
- min-height:0;
- background:#282a36;
-}
-
-.lbl{
- background:#1e1e2e;
- color:#a6adc8;
- font-size:12px;
- padding:5px 10px;
- display:flex;
- justify-content:space-between;
- align-items:center;
- border-bottom:1px solid #282a36;
-}
-
-.editor-wrap{
- flex:1;
- display:flex;
- position:relative;
- overflow:hidden;
- min-height:0;
-}
-
-#lineNums{
- background:#21222c;
- color:#6272a4;
- padding:12px 6px;
- font-family:monospace;
- font-size:17px;
- line-height:1.5;
- text-align:right;
- user-select:none;
- overflow:hidden;
- min-width:34px;
- border-right:1px solid #343746;
-}
-
-textarea#code{
- flex:1;
- background:#282a36;
- color:#f8f8f2;
- border:none;
- padding:12px 10px;
- font-family:monospace;
- font-size:17px;
- line-height:1.5;
- resize:none;
- outline:none;
- white-space:pre;
- overflow:auto;
-}
-
-.CodeMirror{
- flex:1;
- height:100%!important;
- font-family:monospace;
- font-size:17px;
- line-height:1.5;
-}
-
-.CodeMirror textarea,
-input,
-textarea{
- font-size:16px!important;
-}
-
-.term-box{
- flex:1;
- display:flex;
- flex-direction:column;
- background:#0b0b12;
- min-height:0;
-}
-
-#out{
- flex:1;
- padding:12px;
- font-family:monospace;
- font-size:17px;
- line-height:1.5;
- color:#a6e3a1;
- overflow-y:auto;
- white-space:pre-wrap;
- word-break:break-word;
- cursor:text;
-}
-
-.u-in{
- color:#89dceb;
- font-weight:bold;
-}
-
-.err{
- color:#f38ba8;
-}
-
-.sys{
- color:#f9e2af;
- font-style:italic;
-}
-
-.hint{
- color:#94e2d5;
- font-size:15px;
-}
-
+*{box-sizing:border-box;margin:0;padding:0;touch-action:manipulation}
+html,body{width:100%;height:100vh;height:100dvh;overflow:hidden;background:#11111b;color:#cdd6f4;font-family:sans-serif}
+body{display:flex;flex-direction:column}
+header{background:#181825;padding:10px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #313244;gap:6px;flex-wrap:nowrap}
+header h1{font-size:15px;color:#89b4fa;white-space:nowrap}
+.btns{display:flex;gap:6px;align-items:center}
+select,button{border:none;padding:8px 11px;border-radius:7px;font-weight:bold;font-size:13px;cursor:pointer}
+select{background:#313244;color:#cdd6f4;max-width:98px}
+#runBtn{background:#a6e3a1;color:#11111b;padding:8px 14px;font-size:14px}
+#runBtn:disabled{background:#585b70;color:#cdd6f4}
+#clearBtn,#histBtn,#fontBtn{background:#313244;color:#cdd6f4}
+.ed-box{flex:1;display:flex;flex-direction:column;border-bottom:2px solid #45475a;min-height:0;background:#282a36}
+.lbl{background:#1e1e2e;color:#a6adc8;font-size:12px;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #282a36}
+.editor-wrap{flex:1;display:flex;position:relative;overflow:hidden;min-height:0}
+#lineNums{background:#21222c;color:#6272a4;padding:12px 6px;font-family:monospace;font-size:17px;line-height:1.5;text-align:right;user-select:none;overflow:hidden;min-width:34px;border-right:1px solid #343746}
+textarea#code{flex:1;background:#282a36;color:#f8f8f2;border:none;padding:12px 10px;font-family:monospace;font-size:17px;line-height:1.5;resize:none;outline:none;white-space:pre;overflow:auto}
+.CodeMirror{flex:1;height:100%!important;font-family:monospace;font-size:17px;line-height:1.5}
+.CodeMirror textarea, input, textarea { font-size: 16px !important; }
+.term-box{flex:1;display:flex;flex-direction:column;background:#0b0b12;min-height:0}
+#out{flex:1;padding:12px;font-family:monospace;font-size:17px;line-height:1.5;color:#a6e3a1;overflow-y:auto;white-space:pre-wrap;word-break:break-word;cursor:text}
+.u-in{color:#89dceb;font-weight:bold}
+.err{color:#f38ba8}
+.sys{color:#f9e2af;font-style:italic}
+.hint{color:#94e2d5;font-size:15px}
 .inline-inp{
- background:transparent;
- border:none;
- border-bottom:1px dashed #89b4fa;
- color:#89dceb;
- font-family:monospace;
- font-size:17px;
- font-weight:bold;
- outline:none;
- width:140px;
- min-width:60px;
- caret-color:#a6e3a1;
- padding:0 2px;
- vertical-align:baseline;
+  background:transparent;
+  border:none;
+  border-bottom:1px dashed #89b4fa;
+  color:#89dceb;
+  font-family:monospace;
+  font-size:17px;
+  font-weight:bold;
+  outline:none;
+  width:140px;
+  min-width:60px;
+  caret-color:#a6e3a1;
+  padding:0 2px;
+  vertical-align:baseline;
 }
-
-#manualBox{
- display:none;
- background:#181825;
- border-top:1px solid #313244;
- padding:8px;
-}
-
-#manualBox.show{
- display:block;
-}
-
-#stdin{
- width:100%;
- height:75px;
- background:#11111b;
- color:#89dceb;
- border:1px solid #45475a;
- border-radius:7px;
- padding:8px;
- font-family:monospace;
- font-size:15px!important;
- resize:vertical;
- outline:none;
-}
-
-.manual-label{
- font-size:12px;
- color:#f9e2af;
- margin-bottom:5px;
- display:flex;
- justify-content:space-between;
-}
-
-#modal{
- display:none;
- position:fixed;
- inset:0;
- background:rgba(0,0,0,.75);
- z-index:99;
- justify-content:center;
- align-items:center;
- padding:15px;
-}
-
-.m-box{
- background:#1e1e2e;
- border:1px solid #45475a;
- border-radius:10px;
- width:100%;
- max-width:440px;
- max-height:75vh;
- display:flex;
- flex-direction:column;
- overflow:hidden;
-}
-
-.m-head{
- background:#181825;
- padding:10px 14px;
- display:flex;
- justify-content:space-between;
- align-items:center;
-}
-
-#hList{
- padding:10px;
- overflow-y:auto;
- display:flex;
- flex-direction:column;
- gap:8px;
-}
-
-.h-item{
- background:#11111b;
- border:1px solid #313244;
- border-radius:6px;
- padding:9px;
- cursor:pointer;
-}
-
-.footer{
- padding:5px 8px;
- text-align:center;
- background:#181825;
- color:#6c7086;
- font-size:10px;
- border-top:1px solid #313244;
-}
-
-@media(max-width:480px){
- header{
-  padding:6px;
- }
- header h1{
-  font-size:13px;
- }
- select,button{
-  padding:7px;
-  font-size:11px;
- }
- #runBtn{
-  padding:7px 10px;
-  font-size:12px;
- }
- .btns{
-  gap:3px;
- }
- select{
-  max-width:90px;
- }
-}
+#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99;justify-content:center;align-items:center;padding:15px}
+.m-box{background:#1e1e2e;border:1px solid #45475a;border-radius:10px;width:100%;max-width:440px;max-height:75vh;display:flex;flex-direction:column;overflow:hidden}
+.m-head{background:#181825;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+#hList{padding:10px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.h-item{background:#11111b;border:1px solid #313244;border-radius:6px;padding:9px;cursor:pointer}
 </style>
 </head>
-
 <body>
-
 <header>
- <h1>⚡ C Lab</h1>
-
- <div class="btns">
-  <button id="fontBtn" type="button" onclick="toggleFont()">A+</button>
-  <button id="histBtn" type="button" onclick="openHist()">🕒</button>
-  <button id="inputBtn" type="button" onclick="toggleManual()">⌨ Input</button>
-
-  <select id="exSel" onchange="loadEx()">
-   <option value="">📂 Examples</option>
-   <option value="add">1. Add 2 Numbers</option>
-   <option value="matrix">2. Matrix Addition</option>
-   <option value="matmul">3. Matrix Multiplication</option>
-   <option value="transpose">4. Matrix Transpose</option>
-   <option value="array">5. Array Sum</option>
-   <option value="max">6. Largest Number</option>
-   <option value="pointer">7. Pointer</option>
-   <option value="swap">8. Swap Function</option>
-   <option value="function">9. Function</option>
-   <option value="recursion">10. Recursion Factorial</option>
-   <option value="prime">11. Prime Check</option>
-   <option value="fact">12. Factorial</option>
-   <option value="fibo">13. Fibonacci</option>
-   <option value="sort">14. Bubble Sort</option>
-   <option value="string">15. String Length</option>
-   <option value="struct">16. Structure</option>
-   <option value="pattern">17. Star Pattern</option>
-   <option value="table">18. Multiplication Table</option>
-   <option value="oddEven">19. Odd Even</option>
-   <option value="calculator">20. Calculator</option>
-  </select>
-
-  <button id="clearBtn" type="button" onclick="clrTerm()">Clear</button>
-  <button id="runBtn" type="button" onclick="runCode()">▶ Run</button>
- </div>
+  <h1>⚡ C Lab</h1>
+  <div class="btns">
+    <button id="fontBtn" type="button" onclick="toggleFont()" title="Font Size">A+</button>
+    <button id="histBtn" type="button" onclick="openHist()">🕒</button>
+    <select id="exSel" onchange="loadEx()">
+      <option value="">📂 Examples</option>
+      <option value="add">1. Add 2 Numbers</option>
+      <option value="matrix">2. Matrix Sum</option>
+      <option value="matmul">3. Matrix Multiply</option>
+      <option value="prime">4. Prime Check</option>
+      <option value="fact">5. Factorial</option>
+    </select>
+    <button id="clearBtn" type="button" onclick="clrTerm()">Clear</button>
+    <button id="runBtn" type="button" onclick="runCode()">▶ Run</button>
+  </div>
 </header>
 
 <div class="ed-box">
- <div class="lbl">
-  <span>main.c <span id="svTxt" style="color:#a6e3a1">• Saved</span></span>
-  <span>By SP</span>
- </div>
-
- <div class="editor-wrap" id="edWrap">
-  <div id="lineNums">1</div>
-
-  <textarea id="code" spellcheck="false">#include <stdio.h>
+  <div class="lbl"><span>main.c <span id="svTxt" style="color:#a6e3a1">• Saved</span></span><span>By SP</span></div>
+  <div class="editor-wrap" id="edWrap">
+    <div id="lineNums">1</div>
+    <textarea id="code" spellcheck="false">#include <stdio.h>
 
 int main() {
     int a, b, sum;
-
     printf("Enter first and second number: ");
     scanf("%d %d", &a, &b);
-
     sum = a + b;
-
     printf("Sum of two numbers = %d\n", sum);
-
     return 0;
 }</textarea>
- </div>
-</div>
-
-<div class="term-box">
- <div class="lbl">
-  <span>Terminal Output</span>
-  <span id="stTxt" style="color:#89b4fa">Ready</span>
- </div>
-
- <div id="manualBox">
-  <div class="manual-label">
-   <span>⌨ Manual Input (stdin)</span>
-   <span>Har input alag line mein likhein</span>
   </div>
-
-  <textarea id="stdin" placeholder="Example:
-10
-20
-
-Ya:
-2 3
-1 2 3 4 5 6"></textarea>
- </div>
-
- <div id="out">▶ Run दबाने के बाद यहाँ output आएगा। Inline Input में cursor पर value लिखें, या ⌨ Input से Manual Input Mode चालू करें।</div>
 </div>
 
-<div class="footer">
-Campus C Lab by SP • C Compiler • Code Auto-Saved
+<div class="term-box" onclick="focusInline()">
+  <div class="lbl"><span>Terminal Output</span><span id="stTxt" style="color:#89b4fa">Ready</span></div>
+  <div id="out">▶ 'Run' dabane ke baad yahan output aayega aur wahin samne cursor par aap value likh sakte hain...</div>
 </div>
 
 <div id="modal" onclick="if(event.target===this)this.style.display='none'">
- <div class="m-box">
-  <div class="m-head">
-   <h3 style="font-size:14px;color:#89b4fa">🕒 Saved History</h3>
-   <button type="button" style="background:#f38ba8;color:#11111b" onclick="document.getElementById('modal').style.display='none'">✕</button>
+  <div class="m-box">
+    <div class="m-head"><h3 style="font-size:14px;color:#89b4fa">🕒 Saved History</h3><button type="button" style="background:#f38ba8;color:#11111b" onclick="document.getElementById('modal').style.display='none'">✕</button></div>
+    <div id="hList"></div>
   </div>
-  <div id="hList"></div>
- </div>
 </div>
 
 <script>
-/* =========================
-   C PROGRAM EXAMPLES
-========================= */
-
 const EX={
-
-add:`#include <stdio.h>
-
-int main() {
-    int a, b, sum;
-
-    printf("Enter two numbers: ");
-    scanf("%d %d", &a, &b);
-
-    sum = a + b;
-
-    printf("Sum = %d\\n", sum);
-    return 0;
-}`,
-
-matrix:`#include <stdio.h>
-
-int main() {
-    int r, c, i, j;
-    int A[10][10], B[10][10], sum[10][10];
-
-    printf("Enter rows and columns: ");
-    scanf("%d %d", &r, &c);
-
-    if(r>10 || c>10 || r<=0 || c<=0) {
-        printf("Invalid size");
-        return 0;
-    }
-
-    printf("Enter first matrix:\\n");
-    for(i=0;i<r;i++)
-        for(j=0;j<c;j++)
-            scanf("%d",&A[i][j]);
-
-    printf("Enter second matrix:\\n");
-    for(i=0;i<r;i++)
-        for(j=0;j<c;j++)
-            scanf("%d",&B[i][j]);
-
-    for(i=0;i<r;i++)
-        for(j=0;j<c;j++)
-            sum[i][j]=A[i][j]+B[i][j];
-
-    printf("Sum Matrix:\\n");
-
-    for(i=0;i<r;i++) {
-        for(j=0;j<c;j++)
-            printf("%d\\t",sum[i][j]);
-        printf("\\n");
-    }
-
-    return 0;
-}`,
-
-matmul:`#include <stdio.h>
-#define MAX 10
-
-int main() {
-    int a[MAX][MAX], b[MAX][MAX], c[MAX][MAX];
-    int r1, c1, r2, c2;
-    int i, j, k;
-
-    printf("Enter rows and columns of first matrix: ");
-    scanf("%d %d", &r1, &c1);
-
-    printf("Enter rows and columns of second matrix: ");
-    scanf("%d %d", &r2, &c2);
-
-    if(r1>MAX || c1>MAX || r2>MAX || c2>MAX ||
-       r1<=0 || c1<=0 || r2<=0 || c2<=0) {
-        printf("Invalid matrix size\\n");
-        return 0;
-    }
-
-    if(c1!=r2) {
-        printf("Multiplication not possible\\n");
-        return 0;
-    }
-
-    printf("Enter first matrix elements:\\n");
-    for(i=0;i<r1;i++)
-        for(j=0;j<c1;j++)
-            scanf("%d",&a[i][j]);
-
-    printf("Enter second matrix elements:\\n");
-    for(i=0;i<r2;i++)
-        for(j=0;j<c2;j++)
-            scanf("%d",&b[i][j]);
-
-    for(i=0;i<r1;i++) {
-        for(j=0;j<c2;j++) {
-            c[i][j]=0;
-
-            for(k=0;k<c1;k++)
-                c[i][j]+=a[i][k]*b[k][j];
-        }
-    }
-
-    printf("Result Matrix:\\n");
-
-    for(i=0;i<r1;i++) {
-        for(j=0;j<c2;j++)
-            printf("%d\\t",c[i][j]);
-        printf("\\n");
-    }
-
-    return 0;
-}`,
-
-transpose:`#include <stdio.h>
-
-int main() {
-    int a[10][10], t[10][10];
-    int r,c,i,j;
-
-    printf("Enter rows and columns: ");
-    scanf("%d %d",&r,&c);
-
-    printf("Enter matrix elements:\\n");
-    for(i=0;i<r;i++)
-        for(j=0;j<c;j++)
-            scanf("%d",&a[i][j]);
-
-    for(i=0;i<r;i++)
-        for(j=0;j<c;j++)
-            t[j][i]=a[i][j];
-
-    printf("Transpose:\\n");
-    for(i=0;i<c;i++) {
-        for(j=0;j<r;j++)
-            printf("%d\\t",t[i][j]);
-        printf("\\n");
-    }
-
-    return 0;
-}`,
-
-array:`#include <stdio.h>
-
-int main() {
-    int a[100],n,i,sum=0;
-
-    printf("Enter number of elements: ");
-    scanf("%d",&n);
-
-    printf("Enter elements:\\n");
-    for(i=0;i<n;i++) {
-        scanf("%d",&a[i]);
-        sum+=a[i];
-    }
-
-    printf("Sum = %d\\n",sum);
-    printf("Average = %.2f\\n",(float)sum/n);
-
-    return 0;
-}`,
-
-max:`#include <stdio.h>
-
-int main() {
-    int a[100],n,i,max;
-
-    printf("Enter number of elements: ");
-    scanf("%d",&n);
-
-    printf("Enter elements:\\n");
-    for(i=0;i<n;i++)
-        scanf("%d",&a[i]);
-
-    max=a[0];
-
-    for(i=1;i<n;i++)
-        if(a[i]>max)
-            max=a[i];
-
-    printf("Largest = %d\\n",max);
-    return 0;
-}`,
-
-pointer:`#include <stdio.h>
-
-int main() {
-    int a=10;
-    int *p=&a;
-
-    printf("Value of a = %d\\n",a);
-    printf("Address of a = %p\\n",(void*)&a);
-    printf("Pointer p = %p\\n",(void*)p);
-    printf("Value using pointer = %d\\n",*p);
-
-    *p=50;
-
-    printf("New value of a = %d\\n",a);
-
-    return 0;
-}`,
-
-swap:`#include <stdio.h>
-
-void swap(int *x,int *y) {
-    int temp;
-    temp=*x;
-    *x=*y;
-    *y=temp;
-}
-
-int main() {
-    int a,b;
-
-    printf("Enter two numbers: ");
-    scanf("%d %d",&a,&b);
-
-    printf("Before swapping: a=%d b=%d\\n",a,b);
-
-    swap(&a,&b);
-
-    printf("After swapping: a=%d b=%d\\n",a,b);
-
-    return 0;
-}`,
-
-function:`#include <stdio.h>
-
-int square(int n) {
-    return n*n;
-}
-
-int main() {
-    int n;
-
-    printf("Enter number: ");
-    scanf("%d",&n);
-
-    printf("Square = %d\\n",square(n));
-
-    return 0;
-}`,
-
-recursion:`#include <stdio.h>
-
-int factorial(int n) {
-    if(n<=1)
-        return 1;
-
-    return n*factorial(n-1);
-}
-
-int main() {
-    int n;
-
-    printf("Enter number: ");
-    scanf("%d",&n);
-
-    printf("Factorial = %d\\n",factorial(n));
-
-    return 0;
-}`,
-
-prime:`#include <stdio.h>
-
-int main() {
-    int n,i,flag=0;
-
-    printf("Enter number: ");
-    scanf("%d",&n);
-
-    if(n<=1)
-        flag=1;
-
-    for(i=2;i<=n/2;i++) {
-        if(n%i==0) {
-            flag=1;
-            break;
-        }
-    }
-
-    if(flag==0)
-        printf("%d is Prime\\n",n);
-    else
-        printf("%d is not Prime\\n",n);
-
-    return 0;
-}`,
-
-fact:`#include <stdio.h>
-
-int main() {
-    int n,i;
-    unsigned long long f=1;
-
-    printf("Enter number: ");
-    scanf("%d",&n);
-
-    if(n<0) {
-        printf("Factorial not possible\\n");
-        return 0;
-    }
-
-    for(i=1;i<=n;i++)
-        f*=i;
-
-    printf("Factorial = %llu\\n",f);
-
-    return 0;
-}`,
-
-fibo:`#include <stdio.h>
-
-int main() {
-    int n,i;
-    int a=0,b=1,c;
-
-    printf("Enter number of terms: ");
-    scanf("%d",&n);
-
-    for(i=0;i<n;i++) {
-        printf("%d ",a);
-        c=a+b;
-        a=b;
-        b=c;
-    }
-
-    printf("\\n");
-    return 0;
-}`,
-
-sort:`#include <stdio.h>
-
-int main() {
-    int a[100],n,i,j,temp;
-
-    printf("Enter array size: ");
-    scanf("%d",&n);
-
-    printf("Enter elements:\\n");
-    for(i=0;i<n;i++)
-        scanf("%d",&a[i]);
-
-    for(i=0;i<n-1;i++) {
-        for(j=0;j<n-1-i;j++) {
-            if(a[j]>a[j+1]) {
-                temp=a[j];
-                a[j]=a[j+1];
-                a[j+1]=temp;
-            }
-        }
-    }
-
-    printf("Sorted array:\\n");
-    for(i=0;i<n;i++)
-        printf("%d ",a[i]);
-
-    printf("\\n");
-    return 0;
-}`,
-
-string:`#include <stdio.h>
-#include <string.h>
-
-int main() {
-    char str[100];
-
-    printf("Enter a string: ");
-    scanf("%99s",str);
-
-    printf("String = %s\\n",str);
-    printf("Length = %lu\\n",(unsigned long)strlen(str));
-
-    return 0;
-}`,
-
-struct:`#include <stdio.h>
-
-struct Student {
-    int roll;
-    float marks;
+  add:`#include <stdio.h>\n\nint main() {\n    int a, b, sum;\n    printf("Enter first and second number: ");\n    scanf("%d %d", &a, &b);\n    sum = a + b;\n    printf("Sum of two numbers = %d\\n", sum);\n    return 0;\n}`,
+  matrix:`#include <stdio.h>\n\nint main() {\n    int r, c, i, j, A[10][10], B[10][10], sum[10][10];\n    printf("Rows aur columns enter karein: ");\n    scanf("%d %d", &r, &c);\n    printf("Pehli matrix ke elements:\\n");\n    for(i=0;i<r;i++) for(j=0;j<c;j++) scanf("%d",&A[i][j]);\n    printf("Doosri matrix ke elements:\\n");\n    for(i=0;i<r;i++) for(j=0;j<c;j++) scanf("%d",&B[i][j]);\n    for(i=0;i<r;i++) for(j=0;j<c;j++) sum[i][j]=A[i][j]+B[i][j];\n    printf("Matrices ka jod:\\n");\n    for(i=0;i<r;i++){for(j=0;j<c;j++)printf("%d\\t",sum[i][j]);printf("\\n");}\n    return 0;\n}`,
+  matmul:`#include <stdio.h>\n#define MAX 10\n\nint main() {\n    int a[MAX][MAX], b[MAX][MAX], c[MAX][MAX];\n    int r1, c1, r2, c2;\n\n    printf("Pehle matrix ki rows aur columns darj karein: ");\n    scanf("%d %d", &r1, &c1);\n\n    printf("Doosre matrix ki rows aur columns darj karein: ");\n    scanf("%d %d", &r2, &c2);\n\n    if (c1 != r2) {\n        printf("Guna sambhav nahi hai: pehle matrix ke columns, doosre ke rows ke barabar hone chahiye.\\n");\n        return 1;\n    }\n\n    printf("Pehle matrix ke elements darj karein:\\n");\n    for (int i = 0; i < r1; i++)\n        for (int j = 0; j < c1; j++)\n            scanf("%d", &a[i][j]);\n\n    printf("Doosre matrix ke elements darj karein:\\n");\n    for (int i = 0; i < r2; i++)\n        for (int j = 0; j < c2; j++)\n            scanf("%d", &b[i][j]);\n\n    for (int i = 0; i < r1; i++) {\n        for (int j = 0; j < c2; j++) {\n            c[i][j] = 0;\n            for (int k = 0; k < c1; k++)\n                c[i][j] += a[i][k] * b[k][j];\n        }\n    }\n\n    printf("Parinam matrix:\\n");\n    for (int i = 0; i < r1; i++) {\n        for (int j = 0; j < c2; j++)\n            printf("%d\\t", c[i][j]);\n        printf("\\n");\n    }\n    return 0;\n}`,
+  prime:`#include <stdio.h>\n\nint main() {\n    int n, i, flag=0;\n    printf("Number enter karein: ");\n    scanf("%d", &n);\n    if(n<=1) flag=1;\n    for(i=2;i<=n/2;i++) if(n%i==0){flag=1;break;}\n    printf(flag==0?"%d Prime hai\\n":"%d Prime nahi hai\\n", n);\n    return 0;\n}`,
+  fact:`#include <stdio.h>\n\nint main() {\n    int n, i; unsigned long long f=1;\n    printf("Number enter karein: ");\n    scanf("%d", &n);\n    for(i=1;i<=n;i++) f*=i;\n    printf("Factorial = %llu\\n", f);\n    return 0;\n}`
 };
 
-int main() {
-    struct Student s;
-
-    printf("Enter roll number and marks: ");
-    scanf("%d %f",&s.roll,&s.marks);
-
-    printf("\\nStudent Details\\n");
-    printf("Roll = %d\\n",s.roll);
-    printf("Marks = %.2f\\n",s.marks);
-
-    return 0;
-}`,
-
-pattern:`#include <stdio.h>
-
-int main() {
-    int i,j,n;
-
-    printf("Enter rows: ");
-    scanf("%d",&n);
-
-    for(i=1;i<=n;i++) {
-        for(j=1;j<=i;j++)
-            printf("* ");
-        printf("\\n");
-    }
-
-    return 0;
-}`,
-
-table:`#include <stdio.h>
-
-int main() {
-    int n,i;
-
-    printf("Enter number: ");
-    scanf("%d",&n);
-
-    for(i=1;i<=10;i++)
-        printf("%d x %d = %d\\n",n,i,n*i);
-
-    return 0;
-}`,
-
-oddEven:`#include <stdio.h>
-
-int main() {
-    int n;
-
-    printf("Enter number: ");
-    scanf("%d",&n);
-
-    if(n%2==0)
-        printf("%d is Even\\n",n);
-    else
-        printf("%d is Odd\\n",n);
-
-    return 0;
-}`,
-
-calculator:`#include <stdio.h>
-
-int main() {
-    float a,b;
-    char op;
-
-    printf("Enter expression (example: 10 + 5): ");
-    scanf("%f %c %f",&a,&op,&b);
-
-    switch(op) {
-        case '+':
-            printf("Result = %.2f\\n",a+b);
-            break;
-
-        case '-':
-            printf("Result = %.2f\\n",a-b);
-            break;
-
-        case '*':
-            printf("Result = %.2f\\n",a*b);
-            break;
-
-        case '/':
-            if(b!=0)
-                printf("Result = %.2f\\n",a/b);
-            else
-                printf("Division by zero not possible\\n");
-            break;
-
-        default:
-            printf("Invalid operator\\n");
-    }
-
-    return 0;
-}`
-};
-
-/* =========================
-   EDITOR
-========================= */
-
-const ta=document.getElementById('code');
-const ln=document.getElementById('lineNums');
-
+const ta=document.getElementById('code'), ln=document.getElementById('lineNums');
 let cm=null;
-let curFont=17;
+let curFont=16;
 
 function toggleFont(){
- curFont=curFont===17?20:(curFont===20?16:17);
-
- document.getElementById('fontBtn').textContent=
-  curFont===20?'A-':'A+';
-
- ta.style.fontSize=curFont+'px';
- ln.style.fontSize=curFont+'px';
- document.getElementById('out').style.fontSize=curFont+'px';
-
- const cmEl=document.querySelector('.CodeMirror');
-
- if(cmEl){
-  cmEl.style.fontSize=curFont+'px';
-  if(cm)cm.refresh();
- }
+  curFont = curFont===17 ? 20 : (curFont===20 ? 16 : 17);
+  document.getElementById('fontBtn').textContent = curFont===20 ? 'A-' : 'A+';
+  ta.style.fontSize = curFont+'px';
+  ln.style.fontSize = curFont+'px';
+  document.getElementById('out').style.fontSize = curFont+'px';
+  const cmEl=document.querySelector('.CodeMirror');
+  if(cmEl){
+    cmEl.style.fontSize = curFont+'px';
+    if(cm) cm.refresh();
+  }
 }
 
 function updLines(){
- const n=ta.value.split('\n').length;
- ln.innerHTML=Array.from({length:n},(_,i)=>i+1).join('<br>');
+  const n=ta.value.split('\n').length;
+  ln.innerHTML=Array.from({length:n},(_,i)=>i+1).join('<br>');
 }
-
-ta.addEventListener('scroll',()=>{
- ln.scrollTop=ta.scrollTop;
-});
+ta.addEventListener('scroll',()=>{ln.scrollTop=ta.scrollTop});
 
 function tryCM(){
- if(typeof CodeMirror!=='undefined'&&!cm){
-  const v=ta.value;
-  ln.style.display='none';
-
-  cm=CodeMirror.fromTextArea(ta,{
-   mode:'text/x-csrc',
-   theme:'dracula',
-   lineNumbers:true,
-   indentUnit:4,
-   tabSize:4,
-   lineWrapping:true,
-   inputStyle:'contenteditable',
-   viewportMargin:Infinity
-  });
-
-  cm.getWrapperElement().addEventListener('cut',e=>{
-   const s=window.getSelection();
-   const v=cm.getValue();
-
-   if(s&&s.toString().replace(/\s/g,'')===v.replace(/\s/g,'')){
-    e.preventDefault();
-
-    if(e.clipboardData)
-     e.clipboardData.setData('text/plain',v);
-
-    cm.setValue('');
-   }
-  });
-
-  cm.setValue(v);
-  cm.on('change',onChg);
- }
+  if(typeof CodeMirror!=='undefined' && !cm){
+    const v=ta.value;
+    ln.style.display='none';
+    cm=CodeMirror.fromTextArea(ta,{mode:'text/x-csrc',theme:'dracula',lineNumbers:true,indentUnit:4,tabSize:4,lineWrapping:true,inputStyle:'contenteditable',viewportMargin:Infinity});cm.getWrapperElement().addEventListener('cut',e=>{const s=window.getSelection(),v=cm.getValue();if(s&&s.toString().replace(/\s/g,'')===v.replace(/\s/g,'')){e.preventDefault();if(e.clipboardData)e.clipboardData.setData('text/plain',v);cm.setValue('');}});
+    cm.setValue(v);
+    cm.on('change',onChg);
+  }
 }
-
 tryCM();
 window.addEventListener('load',tryCM);
 
 const getC=()=>cm?cm.getValue():ta.value;
+const setC=v=>{if(cm)cm.setValue(v);else{ta.value=v;updLines();}};
 
-const setC=v=>{
- if(cm)cm.setValue(v);
- else{
-  ta.value=v;
-  updLines();
- }
- onChg();
-};
-
-/* Auto Save */
-
-try{
- const sv=localStorage.getItem('sp_c_code');
- if(sv&&sv.trim())setC(sv);
-}catch(e){}
-
+const sv=localStorage.getItem('sp_c_code');
+if(sv&&sv.trim()) setC(sv);
 updLines();
 
 function onChg(){
- updLines();
-
- try{
+  updLines();
   localStorage.setItem('sp_c_code',getC());
- }catch(e){}
-
- document.getElementById('svTxt').textContent='• Saved';
+  document.getElementById('svTxt').textContent='• Saved';
 }
-
 ta.addEventListener('input',onChg);
 
-/* =========================
-   HISTORY
-========================= */
-
 function saveHist(c){
- if(!c.trim())return;
-
- let h=[];
-
- try{
-  h=JSON.parse(localStorage.getItem('sp_c_hist')||'[]');
- }catch(e){h=[];}
-
- if(h.length&&h[0].c.trim()===c.trim())return;
-
- h.unshift({
-  t:new Date().toLocaleString('en-IN',{
-   day:'2-digit',
-   month:'short',
-   year:'numeric',
-   hour:'2-digit',
-   minute:'2-digit'
-  }),
-  c
- });
-
- try{
+  if(!c.trim())return;
+  let h=JSON.parse(localStorage.getItem('sp_c_hist')||'[]');
+  if(h.length&&h[0].c.trim()===c.trim())return;
+  h.unshift({t:new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),c});
   localStorage.setItem('sp_c_hist',JSON.stringify(h.slice(0,50)));
- }catch(e){}
 }
 
 function openHist(){
- const list=document.getElementById('hList');
- let h=[];
-
- try{
-  h=JSON.parse(localStorage.getItem('sp_c_hist')||'[]');
- }catch(e){h=[];}
-
- list.innerHTML=h.length?'':'<p style="font-size:13px;color:#a6adc8">Koi saved program nahi hai.</p>';
-
- h.forEach((x,i)=>{
-  const d=document.createElement('div');
-  d.className='h-item';
-
-  d.innerHTML=`
-   <div style="font-size:11px;color:#f9e2af">
-    #${i+1} • ${esc(x.t)}
-   </div>
-   <div style="font-family:monospace;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-    ${esc(x.c.replace(/\n/g,' '))}
-   </div>`;
-
-  d.onclick=()=>{
-   setC(x.c);
-   document.getElementById('modal').style.display='none';
-   clrTerm();
-  };
-
-  list.appendChild(d);
- });
-
- document.getElementById('modal').style.display='flex';
+  const list=document.getElementById('hList'), h=JSON.parse(localStorage.getItem('sp_c_hist')||'[]');
+  list.innerHTML=h.length?'':'<p style="font-size:13px;color:#a6adc8">Koi saved program nahi hai.</p>';
+  h.forEach((x,i)=>{
+    const d=document.createElement('div');d.className='h-item';
+    d.innerHTML=`<div style="font-size:11px;color:#f9e2af">#${i+1} • ${x.t}</div><div style="font-family:monospace;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(x.c.replace(/\n/g,' '))}</div>`;
+    d.onclick=()=>{setC(x.c);document.getElementById('modal').style.display='none';clrTerm();};
+    list.appendChild(d);
+  });
+  document.getElementById('modal').style.display='flex';
 }
 
 function loadEx(){
- const s=document.getElementById('exSel');
-
- if(s.value&&EX[s.value]){
-  saveHist(getC());
-  setC(EX[s.value]);
-  clrTerm();
- }
-
- s.value='';
+  const s=document.getElementById('exSel');
+  if(s.value&&EX[s.value]){saveHist(getC());setC(EX[s.value]);clrTerm();}
+  s.value='';
 }
 
-/* =========================
-   INPUT MODE
-========================= */
+const out=document.getElementById('out'),rBtn=document.getElementById('runBtn'),st=document.getElementById('stTxt');
+let grps=[],toks=[],gIdx=0,tInG=0,running=false,vars={},activeInp=null;
 
-let manualMode=false;
+function focusInline(){
+  if(activeInp) activeInp.focus();
+}
 
-function toggleManual(){
- manualMode=!manualMode;
+function clrTerm(){
+  activeInp=null;
+  out.innerHTML='';
+  st.textContent='Ready';
+}
 
- const box=document.getElementById('manualBox');
- const btn=document.getElementById('inputBtn');
+function parseCode(code){
+  const cl=code.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/.*$/gm,''),lines=cl.split('\n'),res=[];
+  let p='',loops=[],inIf=false;
+  lines.forEach((l,i)=>{
+    const t=l.trim();
+    if(/^if\s*\(/.test(t)){
+      if(t.includes('{')) inIf=true;
+      return;
+    }
+    if(inIf){if(t.includes('}'))inIf=false;return;}
+    const fm=t.match(/\bfor\s*\([^;]*;\s*[a-zA-Z_]\w*\s*(<=|<)\s*([a-zA-Z0-9_]+)\s*;/);
+    if(fm)loops.push({op:fm[1],b:fm[2],i});
+    const pm=t.match(/\bprintf\s*\(\s*"((?:[^"\\]|\\.)*)"\s*\)\s*;/);
+    if(pm&&!/%[sdfclux]/i.test(pm[1]))p+=pm[1].replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\"/g,'"');
+    const sm=t.match(/\bscanf\s*\(\s*"([^"]*)"\s*,\s*([^)]+)\)/);
+    if(sm){
+      const sp=sm[1].match(/%[0-9.]*[diuoxXfFeEgGaAcsp]/g)||['%d'];
+      const vn=sm[2].split(',').map(v=>v.replace(/&/g,'').trim());
+      res.push({p:p||'Enter value: ',cnt:sp.length,sp,vn,lp:loops.filter(x=>i-x.i<=4)});
+      p='';loops=[];
+    }
+  });
+  return res;
+}
 
- box.classList.toggle('show',manualMode);
- btn.
+function expCnt(g){
+  let m=1;
+  g.lp.forEach(x=>{let b=parseInt(x.b,10);if(isNaN(b))b=vars[x.b]!==undefined?vars[x.b]:1;if(x.op==='<=')b++;if(b>0)m*=b;});
+  return g.cnt*m;
+}
+
+async function runCode(){
+  const c=getC();saveHist(c);toks=[];gIdx=0;tInG=0;vars={};running=true;activeInp=null;out.innerHTML='';rBtn.disabled=true;
+  grps=parseCode(c);
+  if(grps.length)showP(true);else await execAPI();
+}
+
+function showP(first){
+  const g=grps[gIdx],tot=expCnt(g),rem=tot-tInG;
+  const promptSpan=document.createElement('span');
+  if(first){
+    promptSpan.textContent=g.p;
+  }else{
+    promptSpan.className='hint';
+    promptSpan.textContent=`↳ (${rem} aur): `;
+  }
+  out.appendChild(promptSpan);
+
+  const inp=document.createElement('input');
+  inp.type='text';
+  inp.className='inline-inp';
+  inp.style.fontSize=curFont+'px';
+  inp.autocomplete='off';
+  inp.autocorrect='off';
+  inp.spellcheck=false;
+  inp.addEventListener('input',()=>{
+    inp.style.width=Math.max(80,(inp.value.length+2)*11)+'px';
+  });
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      e.preventDefault();
+      sendIn(inp);
+    }
+  });
+
+  out.appendChild(inp);
+  activeInp=inp;
+  out.scrollTop=out.scrollHeight;
+  st.textContent=`Input (${tInG}/${tot})`;
+  setTimeout(()=>inp.focus(),10);
+}
+
+async function sendIn(inp){
+  if(!running||!inp)return;
+  const raw=inp.value.trim();
+  if(!raw){
+    inp.placeholder='value likhein...';
+    inp.focus();
+    return;
+  }
+  const g=grps[gIdx],tot=expCnt(g),nt=raw.split(/\s+/);
+  for(let i=0;i<nt.length;i++){
+    const sp=g.sp[(tInG+i)%g.sp.length];
+    if(/%[diu]/i.test(sp)&&!/^-?\d+$/.test(nt[i])){
+      const errSpan=document.createElement('span');
+      errSpan.className='err';
+      errSpan.textContent=`\n⚠ '${nt[i]}' number nahi hai! Dobara likhein: `;
+      inp.replaceWith(document.createTextNode(raw));
+      out.appendChild(errSpan);
+      const retryInp=document.createElement('input');
+      retryInp.type='text';
+      retryInp.className='inline-inp';
+      retryInp.style.fontSize=curFont+'px';
+      retryInp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendIn(retryInp);}});
+      out.appendChild(retryInp);
+      activeInp=retryInp;
+      out.scrollTop=out.scrollHeight;
+      retryInp.focus();
+      return;
+    }
+  }
+
+  const valSpan=document.createElement('span');
+  valSpan.className='u-in';
+  valSpan.textContent=raw+'\n';
+  inp.replaceWith(valSpan);
+  activeInp=null;
+
+  if(g.lp.length===0)nt.forEach((t,i)=>{const v=g.vn[tInG+i];if(v&&!isNaN(parseInt(t,10)))vars[v]=parseInt(t,10);});
+  toks.push(...nt);
+  tInG+=nt.length;
+
+  if(tInG<tot)showP(false);
+  else{
+    gIdx++;tInG=0;
+    if(gIdx<grps.length)showP(true);
+    else await execAPI();
+  }
+}
+
+function toBase64(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function fromBase64(str){
+  if(!str) return '';
+  try{return decodeURIComponent(escape(atob(str)));}catch(e){return atob(str);}
+}
+
+async function fetchWithTimeout(url, opts, ms=7500){
+  const ctrl=new AbortController();
+  const id=setTimeout(()=>ctrl.abort(),ms);
+  try{
+    const res=await fetch(url,{...opts,signal:ctrl.signal});
+    clearTimeout(id);
+    return res;
+  }catch(e){
+    clearTimeout(id);
+    throw e;
+  }
+}
+
+async function runJudge0(code, stdinStr){
+  const r=await fetchWithTimeout('https://ce.judge0.com/submissions/?base64_encoded=true&wait=true',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      source_code:toBase64(code),
+      language_id:50,
+      stdin:toBase64(stdinStr)
+    })
+  },8500);
+  if(!r.ok) throw new Error('Judge0 HTTP '+r.status);
+  const d=await r.json();
+  if(d.compile_output){
+    return {compileErr:fromBase64(d.compile_output)};
+  }
+  return {
+    stdout:fromBase64(d.stdout),
+    stderr:fromBase64(d.stderr) || (d.message?fromBase64(d.message):''),
+    exitCode:d.exit_code ?? (d.status && d.status.id===3 ? 0 : 1)
+  };
+}
+
+async function runWandbox(code, stdinStr){
+  const r=await fetchWithTimeout('https://wandbox.org/api/compile.json',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({compiler:'gcc-head-c',code:code,stdin:stdinStr,save:false})
+  },7000);
+  if(!r.ok) throw new Error('Wandbox HTTP '+r.status);
+  const d=await r.json();
+  if(d.program_error && d.program_error.includes('Resource temporarily unavailable')){
+    throw new Error('Busy');
+  }
+  if(d.compiler_error){
+    return {compileErr:d.compiler_error};
+  }
+  return {
+    stdout:d.program_output||'',
+    stderr:d.program_error||'',
+    exitCode:d.status??0
+  };
+}
+
+async function execAPI(){
+  st.textContent='Compiling (GCC)...';
+  const code=getC();
+  const stdinStr=toks.length?toks.join('\n')+'\n':'';
+
+  let result=null;
+
+  try{
+    result=await Promise.any([
+      runJudge0(code, stdinStr),
+      runWandbox(code, stdinStr)
+    ]);
+  }catch(allErr){
+    try{
+      st.textContent='Retrying GCC...';
+      result=await runJudge0(code, stdinStr);
+    }catch(retryErr){}
+  }
+
+  if(result){
+    if(result.compileErr){
+      out.innerHTML=`<span class="err">Compilation Error:\n${esc(result.compileErr)}</span>`;
+      done('Error');return;
+    }
+    let rem=result.stdout||'';
+    grps.forEach(g=>{if(rem.startsWith(g.p))rem=rem.slice(g.p.length);});
+    if(rem)out.innerHTML+=esc(rem);
+    if(result.stderr)out.innerHTML+=`\n<span class="err">${esc(result.stderr)}</span>`;
+    out.innerHTML+=`\n\n<span class="sys">--- Finished (Exit Code: ${result.exitCode}) ---</span>`;
+    out.scrollTop=out.scrollHeight;
+    done('Finished');
+    return;
+  }
+
+  out.innerHTML+=`\n<span class="err">Network Error: Compiler server se connect nahi ho paya. Apna internet connection check karein aur dubara Run dabayein.</span>`;
+  done('Failed');
+}
+
+function done(s){running=false;rBtn.disabled=false;activeInp=null;st.textContent=s;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
